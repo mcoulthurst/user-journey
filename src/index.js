@@ -57,7 +57,7 @@ wrap = d3.textwrap()
   .data(arr)
   .enter()
   .append('g')
-  .attr('transform', `translate(${0},${50})`);
+  //.attr('transform', `translate(${0},${50})`);
 
   g.append('text')
   .attr('transform', (d, i) => `translate(${i * box.width + 50}, -${20})`)
@@ -98,9 +98,24 @@ wrap = d3.textwrap()
   .text((d) => d['Pain points'])
   .attr('text-anchor', 'start');
 
+  // add circles for emotions
+  g.append('rect')
+  .attr('fill', '#ACBEEC')
+  .attr('stroke', '#999')
+  .attr('stroke-opacity', 1)
+  .attr('stroke-width', 1)
+  .attr('width', 10)
+  .attr('height', 10)
+  .attr('rotation', 90)
+  .attr('transform', (d, i) => `translate(${i * box.width + 100 }, ${350  + 320 - (d.Emotion*30)}) rotate(45 5 5) `)
+
+
+
   var text = d3.selectAll('text');
   // run the text wrapping function on all text nodes
   text.call(wrap);
+
+
 
 }
 
