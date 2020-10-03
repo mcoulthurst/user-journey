@@ -4,10 +4,10 @@ import { textwrap } from 'd3-textwrap';
 
 const d3 = Object.assign(d3Base);
 d3.textwrap = textwrap;
-const URL = "assets/data/user.csv";
+const URL = "assets/data/packup.csv";
 const margin = { top: 40, right: 80, bottom: 0, left: 0 };
-var width = 1000;
-var height = 700;
+var width = 1200;
+var height = 900;
 var svg;
 
 var ht_row = 170;
@@ -37,9 +37,10 @@ function processData(arr) {
       showError('Too Many Rows');
   }else{
       //drawSidePanel(arr.slice(0,5));
+      //drawJourney(arr.slice(5));
 
-      drawJourney(arr.slice(5));
-      drawCurves(arr.slice(5));
+      drawJourney(arr);
+      drawCurves(arr);
   }
 
 }
@@ -87,15 +88,22 @@ function bzCurve(points, f, t) {
 } 
 
 function drawCurves(arr){
-  var lines = [];   
+  var lines = [];
+  var xPos;
+  var yPos;
+  var pt;
    for (var i = 0; i < arr.length; i++ ) { 
-    //translate(${i * box.width + 100 }, ${350  + 320 - (d.Emotion*30)}) rotate(45 5 5) `)
-      var yPos = 350  + 320 - (arr[i].Emotion*30); 
-      var xPos = i * 120 + 100;
-     // var pt = { x: xPos, y: yPos }; 
-      var pt = [xPos, yPos]; 
+      yPos = 320 - (arr[i].Emotion*30); 
+      xPos = i * 120 + 50;
+      pt = [xPos, yPos]; 
       lines.push(pt); 
-  } 
+  }
+  // add end point
+  yPos = 290;
+  xPos =  arr.length * 120 + 50;
+  pt = [xPos, yPos]; 
+  lines.push(pt); 
+
   console.log(lines);
 
   const line2 = d3.line().curve(d3.curveCardinal);
@@ -128,11 +136,11 @@ wrap = d3.textwrap()
   //.attr('transform', `translate(${0},${50})`);
 
   g.append('text')
-  .attr('transform', (d, i) => `translate(${i * box.width + 50}, ${20})`)
+  .attr('transform', (d, i) => `translate(${i * box.width + 50}, ${340})`)
   .attr('class', 'title')
   .attr('fill', '#333')
   .attr('stroke', '#333')
-  .attr('font-size', 14)
+  .attr('font-size', 20)
   .attr('width', box.width)
   .attr('height', box.width)
   //.attr('font-family', 'Montserrat')
@@ -141,29 +149,49 @@ wrap = d3.textwrap()
   .attr('text-anchor', 'start');
 
   g.append('text')
-  .attr('transform', (d, i) => `translate(${i * box.width + 50}, ${200})`)
+  .attr('transform', (d, i) => `translate(${i * box.width + 50}, ${20})`)
   .attr('class', 'title')
   .attr('fill', '#333')
-  .attr('stroke', '#333')
-  .attr('font-size', 14)
+  .attr('stroke', 'none')
+  .attr('font-size', 12)
   .attr('width', box.width)
   .attr('height', box.width)
  // .attr('font-family', 'Montserrat')
   .attr('font-weight',100)
-  .text((d) => d['Touch points'])
+  .text((d) => {
+    //var txt = d['Touch points'];
+    //txt = txt.split('|').join('\n\n');
+    return d['Touch points']
+  })
   .attr('text-anchor', 'start');
 
   g.append('text')
-  .attr('transform', (d, i) => `translate(${i * box.width + 50}, ${250})`)
+  .attr('transform', (d, i) => `translate(${i * box.width + 50}, ${380})`)
   .attr('class', 'title')
   .attr('fill', '#333')
-  .attr('stroke', '#333')
-  .attr('font-size', 14)
+  .attr('stroke', 'none')
+  .attr('font-size', 12)
   .attr('width', box.width)
   .attr('height', box.width)
   //.attr('font-family', 'Montserrat')
   .attr('font-weight',100)
-  .text((d) => d['Pain points'])
+  .text((d) => {
+    //var txt = d.Notes. split('|').join('\n');
+    return d.Notes
+  })
+  .attr('text-anchor', 'start');
+
+  g.append('text')
+  .attr('transform', (d, i) => `translate(${i * box.width + 50}, ${550})`)
+  .attr('class', 'title')
+  .attr('fill', '#333')
+  .attr('stroke', 'none')
+  .attr('font-size', 12)
+  .attr('width', box.width)
+  .attr('height', box.width)
+  //.attr('font-family', 'Montserrat')
+  .attr('font-weight',100)
+  .text((d) => d.Opportunities)
   .attr('text-anchor', 'start');
 
   // add circles for emotions
@@ -177,7 +205,7 @@ wrap = d3.textwrap()
   .attr('width', 10)
   .attr('height', 10)
   .attr('rotation', 90)
-  .attr('transform', (d, i) => `translate(${i * box.width + 100 }, ${350  + 320 - (d.Emotion*30)}) rotate(45 0 0) `)
+  .attr('transform', (d, i) => `translate(${i * box.width + 50}, ${320 - (d.Emotion*30)}) rotate(45 0 0) `)
 
   var text = d3.selectAll('text');
   // run the text wrapping function on all text nodes
