@@ -104,15 +104,13 @@ function drawCurves(arr){
   pt = [xPos, yPos]; 
   lines.push(pt); 
 
-  console.log(lines);
-
-  const line2 = d3.line().curve(d3.curveCardinal);
-  console.log(line2(lines));
+  const lineFunction = d3.line().curve(d3.curveCardinal);
 
   var path = svg.append('path')
-    .attr('d', line2(lines))
-    .attr("stroke", 'black')
+    .attr('d', lineFunction(lines))
+    .attr("stroke", '#333')
     .attr("stroke-width", 1)
+    .attr("stroke-dasharray", "2 , 5")
     .attr("fill", "none");
 
     console.log('Append path', path);
@@ -153,7 +151,7 @@ wrap = d3.textwrap()
   .attr('class', 'title')
   .attr('fill', '#333')
   .attr('stroke', 'none')
-  .attr('font-size', 12)
+  .attr('font-size', 10)
   .attr('width', box.width)
   .attr('height', box.width)
  // .attr('font-family', 'Montserrat')
@@ -190,20 +188,18 @@ wrap = d3.textwrap()
   .attr('width', box.width)
   .attr('height', box.width)
   //.attr('font-family', 'Montserrat')
-  .attr('font-weight',100)
+  .attr('font-weight', 200)
   .text((d) => d.Opportunities)
   .attr('text-anchor', 'start');
 
   // add circles for emotions
-  g.append('rect')
-  .attr('fill', '#ACBEEC')
-  .attr('stroke', '#999')
-  .attr('stroke-opacity', 1)
-  .attr('stroke-width', 1)
+  g.append('svg:circle')
+  .attr('r', 3)
+  .attr('fill', '#000')
+  .attr('stroke', '#000')
+/* 
   .attr('x', -5)
-  .attr('y', -5)
-  .attr('width', 10)
-  .attr('height', 10)
+  .attr('y', -5) */
   .attr('rotation', 90)
   .attr('transform', (d, i) => `translate(${i * box.width + 50}, ${320 - (d.Emotion*30)}) rotate(45 0 0) `)
 
