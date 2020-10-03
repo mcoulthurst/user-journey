@@ -5,7 +5,7 @@ import { textwrap } from 'd3-textwrap';
 const d3 = Object.assign(d3Base);
 d3.textwrap = textwrap;
 const URL = "assets/data/packup.csv";
-const margin = { top: 40, right: 80, bottom: 0, left: 0 };
+const margin = { top: 20, right: 20, bottom: 20, left: 20 };
 var width = 1200;
 var height = 900;
 var svg;
@@ -136,14 +136,14 @@ wrap = d3.textwrap()
   g.append('text')
   .attr('transform', (d, i) => `translate(${i * box.width + 50}, ${340})`)
   .attr('class', 'title')
-  .attr('fill', '#333')
-  .attr('stroke', '#333')
-  .attr('font-size', 20)
+  .attr('fill', '#fff')
+  .attr('stroke', '#fff')
+  .attr('font-size', 18)
   .attr('width', box.width)
   .attr('height', box.width)
   //.attr('font-family', 'Montserrat')
   .attr('font-weight',100)
-  .text((d) => d.Tasks)
+  .text((d) => d.Tasks.toUpperCase())
   .attr('text-anchor', 'start');
 
   g.append('text')
@@ -152,6 +152,13 @@ wrap = d3.textwrap()
   .attr('fill', '#333')
   .attr('stroke', 'none')
   .attr('font-size', 10)
+  .attr('y', (d) => {
+    let offset =0;
+    if( d.Emotion>=5 ){
+      offset = 200;
+    }
+    return offset
+  })
   .attr('width', box.width)
   .attr('height', box.width)
  // .attr('font-family', 'Montserrat')
@@ -180,7 +187,7 @@ wrap = d3.textwrap()
   .attr('text-anchor', 'start');
 
   g.append('text')
-  .attr('transform', (d, i) => `translate(${i * box.width + 50}, ${550})`)
+  .attr('transform', (d, i) => `translate(${i * box.width + 50}, ${530})`)
   .attr('class', 'title')
   .attr('fill', '#333')
   .attr('stroke', 'none')
@@ -206,10 +213,7 @@ wrap = d3.textwrap()
   var text = d3.selectAll('text');
   // run the text wrapping function on all text nodes
   text.call(wrap);
-
 }
-
-
 
 function initSVG() {
   svg = d3
@@ -220,10 +224,106 @@ function initSVG() {
     .attr("margin-left", margin.left + "px")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 }
+
+function layout(){
+  const fill = '#e3e3e3';
+
+  svg.append('svg:rect')
+    .attr('height', 310)
+    .attr('width', width)
+    .attr('fill', '#e3e3e3')
+    .attr('x', 0)
+    .attr('y', 0);
+
+  svg.append('svg:rect')
+    .attr('height', 310)
+    .attr('width', 20)
+    .attr('fill', '#4D4844')
+    .attr('x', 0)
+    .attr('y', 0);
+
+  svg.append('text')
+    .attr("transform", function(d,i){
+      var xText = 15;//i * (w / data.length);
+      var yText = 200;//h - yScale(d.v);
+      return "translate(" + xText + "," + yText + ") rotate(270)";
+    })
+    .attr('class', 'subtitle')
+    .attr('fill', '#eee')
+    .attr('stroke', 'none')
+    .attr('font-size', 12)
+    .attr('font-weight', 100)
+    .attr('text-anchor', 'center')
+    .text('Touch points'.toUpperCase());
+
+  svg.append('svg:rect')
+    .attr('height', 30)
+    .attr('width', width)
+    .attr('fill', '#32BBB9')
+    .attr('x', 0)
+    .attr('y', 320);
+
+  svg.append('svg:rect')
+    .attr('height', 140)
+    .attr('width', width)
+    .attr('fill', fill)
+    .attr('x', 0)
+    .attr('y', 360);
+
+  svg.append('svg:rect')
+    .attr('height', 140)
+    .attr('width', 20)
+    .attr('fill', '#A7488C')
+    .attr('x', 0)
+    .attr('y', 360);
+
+    svg.append('text')
+    .attr("transform", function(d,i){
+      var xText = 15;
+      var yText = 450;
+      return "translate(" + xText + "," + yText + ") rotate(270)";
+    })
+    .attr('class', 'subtitle')
+    .attr('fill', '#eee')
+    .attr('stroke', 'none')
+    .attr('font-size', 12)
+    .attr('font-weight', 100)
+    .attr('text-anchor', 'center')
+    .text('Notes'.toUpperCase());
+
+  svg.append('svg:rect')
+    .attr('height', 150)
+    .attr('width', width)
+    .attr('fill', fill)
+    .attr('x',0)
+    .attr('y', 510);
+
+  svg.append('svg:rect')
+    .attr('height', 150)
+    .attr('width', 20)
+    .attr('fill', '#DFB164')
+    .attr('x',0)
+    .attr('y', 510);
+
+    svg.append('text')
+    .attr("transform", function(d,i){
+      var xText = 15;
+      var yText = 630;
+      return "translate(" + xText + "," + yText + ") rotate(270)";
+    })
+    .attr('class', 'subtitle')
+    .attr('fill', '#eee')
+    .attr('stroke', 'none')
+    .attr('font-size', 12)
+    .attr('font-weight', 100)
+    .attr('text-anchor', 'center')
+    .text('Opportunities'.toUpperCase());
+}
+
 function callback(data){
   console.log(data);
-
 }
+
 document.addEventListener("DOMContentLoaded", function () {
   console.log("ready");
 
@@ -235,5 +335,6 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   initSVG();
+  layout();
 
 });
