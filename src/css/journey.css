@@ -36,5 +36,6 @@ input[type="file"] {
 }
 
 .button-wrap {
+  margin-left:20px;
   position: relative;
 }
