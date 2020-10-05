@@ -8,7 +8,10 @@ const d3 = Object.assign(d3Base);
 d3.textwrap = textwrap;
 const URL = 'assets/data/packup.csv';
 const margin = {
-  top: 20, right: 20, bottom: 20, left: 20,
+  top: 20,
+  right: 20,
+  bottom: 20,
+  left: 20,
 };
 const width = 1200;
 const offset = 90;
@@ -19,7 +22,9 @@ const ctx = canv.getContext('2d');
 const box = { width: 120 };
 
 function processData(arr) {
-  if (arr.length < 6) {
+  console.log(arr);
+ /* 
+ if (arr.length < 6) {
     // showError('Not enough Data');
   } else if (arr.length > 20) {
     // showError('Too Many Rows');
@@ -30,6 +35,10 @@ function processData(arr) {
     drawJourney(arr);
     drawCurves(arr);
   }
+ */
+  
+  drawJourney(arr);
+  drawCurves(arr);
 }
 
 function drawCurves(arr) {
@@ -66,11 +75,15 @@ function drawCurves(arr) {
     .attr('rotation', 90)
     .attr(
       'transform',
-      (d, i) => `translate(${i * box.width + 50}, ${offset + 320 - d.Emotion * 3}) rotate(45 0 0) `,
+      (d, i) =>
+        `translate(${i * box.width + 50}, ${
+          offset + 320 - d.Emotion * 3
+        }) rotate(45 0 0) `
     );
 }
 
 function drawJourney(arr) {
+  console.log(arr);
   const fill = '#4D4844';
   // create a text wrapping function
   const wrap = d3
@@ -93,7 +106,10 @@ function drawJourney(arr) {
     .attr('text-anchor', 'start');
 
   g.append('text')
-    .attr('transform', (d, i) => `translate(${i * box.width + 50}, ${offset + 340})`)
+    .attr(
+      'transform',
+      (d, i) => `translate(${i * box.width + 50}, ${offset + 340})`
+    )
     .attr('class', 'title')
     .attr('fill', '#fff')
     .attr('stroke', '#fff')
@@ -105,7 +121,10 @@ function drawJourney(arr) {
     .attr('text-anchor', 'start');
 
   g.append('text')
-    .attr('transform', (d, i) => `translate(${i * box.width + 50}, ${offset + 20})`)
+    .attr(
+      'transform',
+      (d, i) => `translate(${i * box.width + 50}, ${offset + 20})`
+    )
     .attr('class', 'block')
     .attr('fill', fill)
     .attr('stroke', 'none')
@@ -125,7 +144,10 @@ function drawJourney(arr) {
     .attr('text-anchor', 'start');
 
   g.append('text')
-    .attr('transform', (d, i) => `translate(${i * box.width + 50}, ${offset + 380})`)
+    .attr(
+      'transform',
+      (d, i) => `translate(${i * box.width + 50}, ${offset + 380})`
+    )
     .attr('class', 'block')
     .attr('fill', fill)
     .attr('stroke', 'none')
@@ -137,7 +159,10 @@ function drawJourney(arr) {
     .attr('text-anchor', 'start');
 
   g.append('text')
-    .attr('transform', (d, i) => `translate(${i * box.width + 50}, ${offset + 530})`)
+    .attr(
+      'transform',
+      (d, i) => `translate(${i * box.width + 50}, ${offset + 530})`
+    )
     .attr('class', 'block')
     .attr('fill', fill)
     .attr('stroke', 'none')
@@ -286,7 +311,7 @@ function download(filename, text) {
   const pom = document.createElement('a');
   pom.setAttribute(
     'href',
-    `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`,
+    `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`
   );
   pom.setAttribute('download', filename);
 
@@ -306,6 +331,39 @@ const canvasSetup = () => {
   const v = Canvg.fromString(ctx, data);
   v.start();
 };
+
+function handleFileSelect(evt) {
+  const { files } = evt.target; // FileList object
+
+  // Loop through the FileList and render image files as thumbnails.
+  for (var i = 0, f; (f = files[i]); i++) {
+    let f = files[i];
+    console.log(f);
+    /*
+      // Only process text files.
+
+      // (except on windows where they are application/vnd.ms-excel)
+      if (!f.type.match('text/csv')) {
+         continue;
+      }
+      */
+
+    var reader = new FileReader();
+
+    // Closure to capture the file information.
+    reader.onload = (function (theFile) {
+      return function (e) {
+        const csv = e.target.result;
+        const data = d3.csvParse(csv)
+        console.log(data);
+        processData(data);
+      };
+    })(f);
+
+    // Read in the file data as text string.
+    reader.readAsText(f);
+  }
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   const downloadSvgButton = document.querySelector('#download-svg-button');
@@ -331,6 +389,12 @@ document.addEventListener('DOMContentLoaded', () => {
   }).then((data) => {
     console.log(data);
     processData(data);
+  });
+
+  const browseButton = document.querySelector('#browse');
+  browseButton.addEventListener('change', (evt) => {
+    //evt.preventDefault();
+    handleFileSelect(evt);
   });
 
   initSVG();
