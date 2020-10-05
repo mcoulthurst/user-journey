@@ -1,6 +1,6 @@
 body {
   background-color:#fafafa;
-  font-family: nexa_light;
+  font-family: 'Montserrat';
   padding: 20px;
 }
 .hidden{
@@ -8,6 +8,9 @@ body {
   visibility: hidden;
 }
 h1{
+  text-transform: uppercase;
+  font-size: 1.2rem;
+  font-weight: 400;
   padding-left: 20px;
 }
 .button {
