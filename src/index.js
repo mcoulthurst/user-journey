@@ -65,7 +65,7 @@ function drawCurves(arr) {
       const textBlock = document.querySelector(`#notes_${i}`);
       let textOffset = 200;
       if (textBlock.children.length > 1) {
-        textOffset = offset + (textBlock.children.length-1) * 10 + 26;
+        textOffset = offset + (textBlock.children.length - 1) * 10 + 26;
       } else if (textBlock.children.length === 1) {
         textOffset = offset + 320 - d.Emotion * 3;
       }
