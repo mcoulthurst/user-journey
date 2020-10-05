@@ -6,9 +6,9 @@ const d3 = Object.assign(d3Base);
 d3.textwrap = textwrap;
 const URL = "assets/data/packup.csv";
 const margin = { top: 20, right: 20, bottom: 20, left: 20 };
-var width = 1200;
-var height = 900;
-var svg;
+let width = 1200;
+let height = 900;
+const svg = d3.select('svg');
 
 var ht_row = 170;
 const wd_row = 30;
@@ -216,6 +216,7 @@ wrap = d3.textwrap()
 }
 
 function initSVG() {
+  /* 
   svg = d3
     .select("#chart")
     .append("svg")
@@ -223,6 +224,8 @@ function initSVG() {
     .attr("height", height + margin.top + margin.bottom)
     .attr("margin-left", margin.left + "px")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+ */
+  svg.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 }
 
 function layout(){
@@ -318,14 +321,47 @@ function layout(){
     .attr('font-weight', 100)
     .attr('text-anchor', 'center')
     .text('Opportunities'.toUpperCase());
+
+    
+  console.log('layout');
 }
 
 function callback(data){
   console.log(data);
 }
 
+function download(filename, text) {
+  const pom = document.createElement('a');
+  pom.setAttribute(
+    'href',
+    `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`,
+  );
+  pom.setAttribute('download', filename);
+
+  if (document.createEvent) {
+    const event = document.createEvent('MouseEvents');
+    event.initEvent('click', true, true);
+    pom.dispatchEvent(event);
+  } else {
+    pom.click();
+  }
+}
+
+
+
 document.addEventListener("DOMContentLoaded", function () {
   console.log("ready");
+
+  const downloadSvgButton = document.querySelector('#download-svg-button');
+  console.log(downloadSvgButton);
+
+  downloadSvgButton.addEventListener('click', () => {
+    const chart = document.querySelector('#chart');
+    const data = chart.outerHTML;
+    console.log(data);
+    download(`ux.svg`, data);
+  });
+
 
   d3.dsv(",", URL, function(d) {
     return d;
