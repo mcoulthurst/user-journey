@@ -1,70 +1,64 @@
-<!doctype html>
+<!DOCTYPE html>
 <html class="no-js" lang="">
+  <head>
+    <meta charset="utf-8" />
+    <title></title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="manifest" href="site.webmanifest" />
+    <link rel="apple-touch-icon" href="icon.png" />
 
-<head>
-  <meta charset="utf-8">
-  <title></title>
-  <meta name="description" content="">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="css/normalize.css" />
+    <link rel="stylesheet" href="css/nexa.css" />
+    <link rel="stylesheet" href="css/journey.css" />
 
-  <link rel="manifest" href="site.webmanifest">
-  <link rel="apple-touch-icon" href="icon.png">
-  <!-- Place favicon.ico in the root directory -->
+    <meta name="theme-color" content="#fafafa" />
+  </head>
 
-  <link rel="stylesheet" href="css/normalize.css">
-  <link rel="stylesheet" href="css/nexa.css" />
-  <link rel="stylesheet" href="css/journey.css">
+  <body>
+    <!--[if IE]>
+      <p class="browserupgrade">
+        You are using an <strong>outdated</strong> browser. Please
+        <a href="https://browsehappy.com/">upgrade your browser</a> to improve
+        your experience and security.
+      </p>
+    <![endif]-->
 
-  <meta name="theme-color" content="#fafafa">
-</head>
-
-<body>
-  <!--[if IE]>
-    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
-  <![endif]-->
-
-  <div class="container-fluid" role="main">
-    <div class="row">
+    <div class="container-fluid" role="main">
+      <div class="row">
         <h1 id="person">User journey</h1>
-    </div>
-
-    <div id="buttons">
-      <button id="download-png-button">Download PNG</button>
-    
-      <button id="download-svg-button">Download SVG</button>
-      <label>Load Data (CSV format):
-        <br/>
-        <input class="" type="file" id="browse" accept=".csv" multiple />
-    </label>
+      </div>
+      <div class="container">
+        <div class="button-wrap">
+          <label class="button" for="browse">Load CSV data
+            <input class="" type="file" id="browse" accept=".csv"/>
+          </label>
+          <button id="download-png-button" class="button">Download PNG</button>
+          <button id="download-svg-button" class="button">Download SVG</button>
+        </div>
       </div>
       <canvas id="canv" class="hidden" width="1200" height="800"></canvas>
-    <div class="row">
+      <div class="row">
         <div id="chart">
-          <svg id="chart" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1200" height="800" viewBox="0 0 1200 800"></svg>
+          <svg
+            id="chart"
+            xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            width="1200"
+            height="800"
+            viewBox="0 0 1200 800"
+          ></svg>
         </div>
+      </div>
     </div>
-  </div>
 
-
-<!-- 
-  <script src="js/vendor/modernizr-3.8.0.min.js"></script>
-  <script src="https://code.jquery.com/jquery-3.4.1.min.js"
-    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-  <script>window.jQuery || document.write('<script src="js/vendor/jquery-3.4.1.min.js"><\/script>')</script>
-  <script src="js/plugins.js"></script>
-  <script src="js/vendor/d3.v3.min.js"></script>
-  <script src="js/vendor/moment.js"></script>
-  <script src="js/journey.js"></script>
-
- -->
-  <!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
-  <!-- 
-  <script>
-    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
-    ga('create', 'UA-XXXXX-Y', 'auto'); ga('set', 'transport', 'beacon'); ga('send', 'pageview')
-  </script>
-  <script src="https://www.google-analytics.com/analytics.js" async></script>
- -->
-</body>
-
+    <!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
+    <!-- 
+    <script>
+      window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+      ga('create', 'UA-XXXXX-Y', 'auto'); ga('set', 'transport', 'beacon'); ga('send', 'pageview')
+    </script>
+    <script src="https://www.google-analytics.com/analytics.js" async></script>
+    -->
+  </body>
 </html>
