@@ -45,22 +45,50 @@ function drawCurves(arr) {
     .attr('stroke-dasharray', '2 , 5')
     .attr('fill', 'none');
 
-  g.selectAll('.dots')
+  const node = g.selectAll('.dots')
     .data(arr)
-    .enter()
-    // add circles for emotions
-    .append('svg:circle')
+    .enter();
+
+  // add circles for emotions
+  node.append('svg:circle')
     .attr('class', 'dots')
     .attr('r', 3)
-    .attr('fill', '#000')
-    .attr('stroke', '#000')
-    .attr('rotation', 90)
+    .attr('fill', '#4D4844')
+    .attr('stroke', '#4D4844')
     .attr(
-      'transform', (d, i) => `translate(${i * box.width + 50}, ${offset + 320 - d.Emotion * 3}) rotate(45 0 0) `,
+      'transform', (d, i) => `translate(${i * box.width + 50}, ${offset + 320 - d.Emotion * 3})`,
     );
+  // add line for links to notes
+  node.append('svg:line')
+    .attr('class', 'lines')
+    .attr('y1', (d, i) => {
+      const textBlock = document.querySelector(`#notes_${i}`);
+      let textOffset = 200;
+      if (textBlock.children.length > 1) {
+        textOffset = offset + (textBlock.children.length-1) * 10 + 26;
+      } else if (textBlock.children.length === 1) {
+        textOffset = offset + 320 - d.Emotion * 3;
+      }
+      if (d.Emotion >= 50) {
+        textOffset = offset + 320 - d.Emotion * 3;
+      }
+      return textOffset;
+    })
+    .attr('y2', (d) => {
+      let textOffset = offset + 320 - d.Emotion * 3;
+      if (d.Emotion >= 50) {
+        textOffset = offset + 204;
+      }
+      return textOffset;
+    })
+    .attr('x1', (d, i) => (i * box.width + 50))
+    .attr('x2', (d, i) => (i * box.width + 50))
+    .attr('stroke-width', 0.5)
+    .attr('stroke-opacity', 0.5)
+    .attr('stroke', '#4D4844');
 }
 
-function drawJourney(arr) {
+function drawTextBlocks(arr) {
   const fill = '#4D4844';
   // create a text wrapping function
   const wrap = d3
@@ -102,6 +130,7 @@ function drawJourney(arr) {
       'transform',
       (d, i) => `translate(${i * box.width + 50}, ${offset + 20})`,
     )
+    .attr('id', (d, i) => `notes_${i}`)
     .attr('class', 'block')
     .attr('fill', fill)
     .attr('stroke', 'none')
@@ -289,6 +318,7 @@ function clearSVG() {
   svg.selectAll('block').remove();
 
   svg.select('.path').remove();
+  svg.select('.lines').remove();
   svg.selectAll('.dots').remove();
 }
 
@@ -318,16 +348,16 @@ function processData(arr) {
     // showError('Too Many Rows');
   } else {
     // drawSidePanel(arr.slice(0,5));
-    // drawJourney(arr.slice(5));
+    // drawTextBlocks(arr.slice(5));
 
-    drawJourney(arr);
+    drawTextBlocks(arr);
     drawCurves(arr);
   }
  */
   clearSVG();
   layout();
 
-  drawJourney(arr);
+  drawTextBlocks(arr);
   drawCurves(arr);
 }
 
