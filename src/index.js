@@ -11,15 +11,14 @@ const margin = {
   top: 20, right: 20, bottom: 20, left: 20,
 };
 const width = 1200;
+const offset = 90;
+
 const svg = d3.select('svg');
 const canv = document.querySelector('#canv');
 const ctx = canv.getContext('2d');
-
 const box = { width: 120 };
 
 function processData(arr) {
-  console.log(arr);
-
   if (arr.length < 6) {
     // showError('Not enough Data');
   } else if (arr.length > 20) {
@@ -40,7 +39,7 @@ function drawCurves(arr) {
   let pt;
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < arr.length; i++) {
-    yPos = 320 - arr[i].Emotion * 30;
+    yPos = offset + 320 - arr[i].Emotion * 30;
     xPos = i * 120 + 50;
     pt = [xPos, yPos];
     lines.push(pt);
@@ -49,8 +48,7 @@ function drawCurves(arr) {
   const lineFunction = d3.line().curve(d3.curveCardinal);
   const g = svg.append('g').attr('id', 'curve');
 
-  const path = g
-    .append('path')
+  g.append('path')
     .attr('d', lineFunction(lines))
     .attr('stroke', '#333')
     .attr('stroke-width', 1)
@@ -68,10 +66,8 @@ function drawCurves(arr) {
     .attr('rotation', 90)
     .attr(
       'transform',
-      (d, i) => `translate(${i * box.width + 50}, ${320 - d.Emotion * 30}) rotate(45 0 0) `,
+      (d, i) => `translate(${i * box.width + 50}, ${offset + 320 - d.Emotion * 30}) rotate(45 0 0) `,
     );
-
-  console.log('Append path', path);
 }
 
 function drawJourney(arr) {
@@ -85,7 +81,7 @@ function drawJourney(arr) {
   const g = svg.selectAll('.title').data(arr).enter().append('g');
 
   g.append('text')
-    .attr('transform', (d, i) => `translate(${i * box.width + 50}, ${340})`)
+    .attr('transform', (d, i) => `translate(${i * box.width + 50}, ${offset + 340})`)
     .attr('class', 'title')
     .attr('fill', '#fff')
     .attr('stroke', '#fff')
@@ -97,17 +93,17 @@ function drawJourney(arr) {
     .attr('text-anchor', 'start');
 
   g.append('text')
-    .attr('transform', (d, i) => `translate(${i * box.width + 50}, ${20})`)
+    .attr('transform', (d, i) => `translate(${i * box.width + 50}, ${offset + 20})`)
     .attr('class', 'block')
     .attr('fill', fill)
     .attr('stroke', 'none')
     .attr('font-size', 10)
     .attr('y', (d) => {
-      let offset = 0;
+      let textOffset = 0;
       if (d.Emotion >= 5) {
-        offset = 200;
+        textOffset = 200;
       }
-      return offset;
+      return textOffset;
     })
     .attr('width', box.width)
     .attr('height', box.width)
@@ -117,7 +113,7 @@ function drawJourney(arr) {
     .attr('text-anchor', 'start');
 
   g.append('text')
-    .attr('transform', (d, i) => `translate(${i * box.width + 50}, ${380})`)
+    .attr('transform', (d, i) => `translate(${i * box.width + 50}, ${offset + 380})`)
     .attr('class', 'block')
     .attr('fill', fill)
     .attr('stroke', 'none')
@@ -129,7 +125,7 @@ function drawJourney(arr) {
     .attr('text-anchor', 'start');
 
   g.append('text')
-    .attr('transform', (d, i) => `translate(${i * box.width + 50}, ${530})`)
+    .attr('transform', (d, i) => `translate(${i * box.width + 50}, ${offset + 530})`)
     .attr('class', 'block')
     .attr('fill', fill)
     .attr('stroke', 'none')
@@ -151,28 +147,41 @@ function initSVG() {
 
 function layout() {
   const fill = '#F5F6F8';
+  const gutter = 10;
+  let rowHt = 80;
+  let yPos = 0;
 
   svg
     .append('svg:rect')
-    .attr('height', 310)
+    .attr('height', rowHt)
+    .attr('width', width)
+    .attr('fill', '#F15159')
+    .attr('x', 0)
+    .attr('y', yPos);
+
+  yPos += rowHt + gutter;
+  rowHt = 310;
+  svg
+    .append('svg:rect')
+    .attr('height', rowHt)
     .attr('width', width)
     .attr('fill', fill)
     .attr('x', 0)
-    .attr('y', 0);
+    .attr('y', yPos);
 
   svg
     .append('svg:rect')
-    .attr('height', 310)
+    .attr('height', rowHt)
     .attr('width', 20)
     .attr('fill', '#4D4844')
     .attr('x', 0)
-    .attr('y', 0);
+    .attr('y', yPos);
 
   svg
     .append('text')
     .attr('transform', () => {
       const xText = 15;
-      const yText = 160;
+      const yText = yPos + rowHt / 2;
       return `translate(${xText}, ${yText}) rotate(270)`;
     })
     .attr('class', 'subtitle')
@@ -184,35 +193,37 @@ function layout() {
     .attr('text-anchor', 'middle')
     .text('Touch points'.toUpperCase());
 
+  yPos += rowHt + gutter;
+  rowHt = 30;
   svg
     .append('svg:rect')
-    .attr('height', 30)
+    .attr('height', rowHt)
     .attr('width', width)
     .attr('fill', '#32BBB9')
     .attr('x', 0)
-    .attr('y', 320);
+    .attr('y', yPos);
 
+  yPos += rowHt + gutter;
+  rowHt = 140;
   svg
     .append('svg:rect')
-    .attr('height', 140)
+    .attr('height', rowHt)
     .attr('width', width)
     .attr('fill', fill)
     .attr('x', 0)
-    .attr('y', 360);
-
+    .attr('y', yPos);
   svg
     .append('svg:rect')
-    .attr('height', 140)
+    .attr('height', rowHt)
     .attr('width', 20)
     .attr('fill', '#A7488C')
     .attr('x', 0)
-    .attr('y', 360);
-
+    .attr('y', yPos);
   svg
     .append('text')
     .attr('transform', () => {
       const xText = 15;
-      const yText = 430;
+      const yText = yPos + rowHt / 2;
       return `translate(${xText}, ${yText}) rotate(270)`;
     })
     .attr('class', 'subtitle')
@@ -224,27 +235,29 @@ function layout() {
     .attr('font-family', 'Montserrat')
     .text('Notes'.toUpperCase());
 
+  yPos += rowHt + gutter;
+  rowHt = 150;
   svg
     .append('svg:rect')
-    .attr('height', 150)
+    .attr('height', rowHt)
     .attr('width', width)
     .attr('fill', fill)
     .attr('x', 0)
-    .attr('y', 510);
+    .attr('y', yPos);
 
   svg
     .append('svg:rect')
-    .attr('height', 150)
+    .attr('height', rowHt)
     .attr('width', 20)
     .attr('fill', '#DFB164')
     .attr('x', 0)
-    .attr('y', 510);
+    .attr('y', yPos);
 
   svg
     .append('text')
     .attr('transform', () => {
       const xText = 15;
-      const yText = 585;
+      const yText = yPos + rowHt / 2;
       return `translate(${xText}, ${yText}) rotate(270)`;
     })
     .attr('class', 'subtitle')
@@ -255,8 +268,6 @@ function layout() {
     .attr('font-weight', 400)
     .attr('text-anchor', 'middle')
     .text('Opportunities'.toUpperCase());
-
-  console.log('layout');
 }
 
 function download(filename, text) {
@@ -302,7 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   d3.dsv(',', URL, (d) => {
-    console.log();
+    console.log(d);
 
     return d;
   }).then((data) => {
