@@ -6,3 +6,7 @@ body {
 svg{
   fill: gold;
 }
+.hidden{
+  display: none;
+  visibility: hidden;
+}

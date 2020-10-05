@@ -1,5 +1,7 @@
 import * as d3Base from 'd3'
 //import * as dsv from 'd3-dsv' // d3 submodule (contains d3.csv, d3.json, etc)
+import Canvg from 'canvg';
+import FileSaver from 'file-saver';
 import { textwrap } from 'd3-textwrap';
 
 const d3 = Object.assign(d3Base);
@@ -9,6 +11,8 @@ const margin = { top: 20, right: 20, bottom: 20, left: 20 };
 let width = 1200;
 let height = 900;
 const svg = d3.select('svg');
+const canv = document.querySelector("#canv");
+const ctx = canv.getContext("2d");
 
 var ht_row = 170;
 const wd_row = 30;
@@ -21,6 +25,7 @@ const wd = 160;
 const gutter = 10;
 const gutterX = 5;
 const gutterY = 32;
+const box = {width:120};
 
 var row_x;
 var row_y;
@@ -99,29 +104,46 @@ function drawCurves(arr){
       lines.push(pt); 
   }
   // add end point
-  yPos = 290;
+/*   yPos = 320 - (arr[arr.length-1].Emotion*30); 
   xPos =  arr.length * 120 + 50;
   pt = [xPos, yPos]; 
-  lines.push(pt); 
+  lines.push(pt);  */
 
   const lineFunction = d3.line().curve(d3.curveCardinal);
 
-  var path = svg.append('path')
+  const g = svg.append('g')
+    .attr('id', 'curve');
+
+  var path = g.append('path')
     .attr('d', lineFunction(lines))
     .attr("stroke", '#333')
     .attr("stroke-width", 1)
     .attr("stroke-dasharray", "2 , 5")
     .attr("fill", "none");
 
+  g.selectAll('.dots')
+    .data(arr)
+    .enter()
+  // add circles for emotions
+  .append('svg:circle')
+  .attr('r', 3)
+  .attr('fill', '#000')
+  .attr('stroke', '#000')
+/* 
+  .attr('x', -5)
+  .attr('y', -5) */
+  .attr('rotation', 90)
+  .attr('transform', (d, i) => `translate(${i * box.width + 50}, ${320 - (d.Emotion*30)}) rotate(45 0 0) `)
+
     console.log('Append path', path);
 
 }
 
 function drawJourney(arr) {
-  const box = {width:120};
+
   var wrap;
-// create a text wrapping function
-wrap = d3.textwrap()
+  // create a text wrapping function
+  wrap = d3.textwrap()
     // wrap to 480 x 960 pixels
     .bounds({height: 100, width: 100})
     // wrap with tspans in all browsers
@@ -140,15 +162,15 @@ wrap = d3.textwrap()
   .attr('stroke', '#fff')
   .attr('font-size', 18)
   .attr('width', box.width)
-  .attr('height', box.width)
-  //.attr('font-family', 'Montserrat')
-  .attr('font-weight',100)
+  //.attr('height', box.width)
+  .attr('font-family', 'Montserrat')
+  .attr('font-weight', 200)
   .text((d) => d.Tasks.toUpperCase())
   .attr('text-anchor', 'start');
 
   g.append('text')
   .attr('transform', (d, i) => `translate(${i * box.width + 50}, ${20})`)
-  .attr('class', 'title')
+  .attr('class', 'block')
   .attr('fill', '#333')
   .attr('stroke', 'none')
   .attr('font-size', 10)
@@ -161,7 +183,7 @@ wrap = d3.textwrap()
   })
   .attr('width', box.width)
   .attr('height', box.width)
- // .attr('font-family', 'Montserrat')
+  .attr('font-family', 'Montserrat')
   .attr('font-weight',100)
   .text((d) => {
     //var txt = d['Touch points'];
@@ -172,13 +194,13 @@ wrap = d3.textwrap()
 
   g.append('text')
   .attr('transform', (d, i) => `translate(${i * box.width + 50}, ${380})`)
-  .attr('class', 'title')
+  .attr('class', 'block')
   .attr('fill', '#333')
   .attr('stroke', 'none')
   .attr('font-size', 12)
   .attr('width', box.width)
-  .attr('height', box.width)
-  //.attr('font-family', 'Montserrat')
+  //.attr('height', box.width)
+  .attr('font-family', 'Montserrat')
   .attr('font-weight',100)
   .text((d) => {
     //var txt = d.Notes. split('|').join('\n');
@@ -188,29 +210,19 @@ wrap = d3.textwrap()
 
   g.append('text')
   .attr('transform', (d, i) => `translate(${i * box.width + 50}, ${530})`)
-  .attr('class', 'title')
+  .attr('class', 'block')
   .attr('fill', '#333')
   .attr('stroke', 'none')
   .attr('font-size', 12)
   .attr('width', box.width)
-  .attr('height', box.width)
-  //.attr('font-family', 'Montserrat')
+  //.attr('height', box.width)
+  .attr('font-family', 'Montserrat')
   .attr('font-weight', 200)
   .text((d) => d.Opportunities)
   .attr('text-anchor', 'start');
 
-  // add circles for emotions
-  g.append('svg:circle')
-  .attr('r', 3)
-  .attr('fill', '#000')
-  .attr('stroke', '#000')
-/* 
-  .attr('x', -5)
-  .attr('y', -5) */
-  .attr('rotation', 90)
-  .attr('transform', (d, i) => `translate(${i * box.width + 50}, ${320 - (d.Emotion*30)}) rotate(45 0 0) `)
 
-  var text = d3.selectAll('text');
+  var text = d3.selectAll('.block');
   // run the text wrapping function on all text nodes
   text.call(wrap);
 }
@@ -248,15 +260,16 @@ function layout(){
   svg.append('text')
     .attr("transform", function(d,i){
       var xText = 15;//i * (w / data.length);
-      var yText = 200;//h - yScale(d.v);
+      var yText = 160;//h - yScale(d.v);
       return "translate(" + xText + "," + yText + ") rotate(270)";
     })
     .attr('class', 'subtitle')
     .attr('fill', '#eee')
     .attr('stroke', 'none')
     .attr('font-size', 12)
-    .attr('font-weight', 100)
-    .attr('text-anchor', 'center')
+    .attr('font-family', 'Montserrat')
+    .attr('font-weight', 400)
+    .attr('text-anchor', 'middle')
     .text('Touch points'.toUpperCase());
 
   svg.append('svg:rect')
@@ -283,15 +296,16 @@ function layout(){
     svg.append('text')
     .attr("transform", function(d,i){
       var xText = 15;
-      var yText = 450;
+      var yText = 430;
       return "translate(" + xText + "," + yText + ") rotate(270)";
     })
     .attr('class', 'subtitle')
     .attr('fill', '#eee')
     .attr('stroke', 'none')
     .attr('font-size', 12)
-    .attr('font-weight', 100)
-    .attr('text-anchor', 'center')
+    .attr('font-weight', 400)
+    .attr('text-anchor', 'middle')
+    .attr('font-family', 'Montserrat')
     .text('Notes'.toUpperCase());
 
   svg.append('svg:rect')
@@ -311,15 +325,16 @@ function layout(){
     svg.append('text')
     .attr("transform", function(d,i){
       var xText = 15;
-      var yText = 630;
+      var yText = 585;
       return "translate(" + xText + "," + yText + ") rotate(270)";
     })
     .attr('class', 'subtitle')
-    .attr('fill', '#eee')
+    .attr('fill', '#333')
     .attr('stroke', 'none')
     .attr('font-size', 12)
-    .attr('font-weight', 100)
-    .attr('text-anchor', 'center')
+    .attr('font-family', 'Montserrat')
+    .attr('font-weight', 400)
+    .attr('text-anchor', 'middle')
     .text('Opportunities'.toUpperCase());
 
     
@@ -347,6 +362,13 @@ function download(filename, text) {
   }
 }
 
+const canvasSetup = () => {
+  const chart = document.querySelector('#chart');
+  const data = chart.outerHTML;
+  
+  const v = Canvg.fromString(ctx, data);
+  v.start();
+}
 
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -362,6 +384,13 @@ document.addEventListener("DOMContentLoaded", function () {
     download(`ux.svg`, data);
   });
 
+  const downloadPngButton = document.querySelector("#download-png-button");
+  downloadPngButton.addEventListener("click", () => {
+    canvasSetup();
+    canv.toBlob(function (blob) {
+      FileSaver.saveAs(blob, "ux.png");
+    });
+  });
 
   d3.dsv(",", URL, function(d) {
     return d;
