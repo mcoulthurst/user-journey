@@ -98,6 +98,7 @@ function drawTextBlocks(arr) {
 
   const g = svg.selectAll('.title').data(arr).enter().append('g');
 
+  // TITLE
   g.append('text')
     .attr('transform', () => `translate(${40}, ${50})`)
     .attr('class', 'title')
@@ -110,6 +111,7 @@ function drawTextBlocks(arr) {
     .text((d) => d.Title.toUpperCase())
     .attr('text-anchor', 'start');
 
+  // TASKS
   g.append('text')
     .attr(
       'transform',
@@ -121,10 +123,11 @@ function drawTextBlocks(arr) {
     .attr('font-size', 18)
     .attr('width', box.width)
     .attr('font-family', 'Montserrat')
-    .attr('font-weight', 200)
+    .attr('font-weight', 'normal')
     .text((d) => d.Tasks.toUpperCase())
     .attr('text-anchor', 'start');
 
+  // TOUCH POINTS
   g.append('text')
     .attr(
       'transform',
@@ -145,10 +148,11 @@ function drawTextBlocks(arr) {
     .attr('width', box.width)
     .attr('height', box.width)
     .attr('font-family', 'Montserrat')
-    .attr('font-weight', 200)
+    .attr('font-weight', 'normal')
     .text((d) => d['Touch points'])
     .attr('text-anchor', 'start');
 
+  // NOTES
   g.append('text')
     .attr(
       'transform',
@@ -160,10 +164,11 @@ function drawTextBlocks(arr) {
     .attr('font-size', 12)
     .attr('width', box.width)
     .attr('font-family', 'Montserrat')
-    .attr('font-weight', 100)
+    .attr('font-weight', 'normal')
     .text((d) => d.Notes)
     .attr('text-anchor', 'start');
 
+  // OPPORTUNITES
   g.append('text')
     .attr(
       'transform',
@@ -175,7 +180,7 @@ function drawTextBlocks(arr) {
     .attr('font-size', 12)
     .attr('width', box.width)
     .attr('font-family', 'Montserrat')
-    .attr('font-weight', 200)
+    .attr('font-weight', 'normal')
     .text((d) => d.Opportunities)
     .attr('text-anchor', 'start');
 
