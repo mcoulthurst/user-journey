@@ -340,7 +340,6 @@ function download(filename, text) {
 }
 
 function processData(arr) {
-  console.log(arr);
   /*
  if (arr.length < 6) {
     // showError('Not enough Data');
@@ -372,10 +371,7 @@ const canvasSetup = () => {
 function handleFileSelect(evt) {
   const file = evt.target.files[0];
   // Only process text files.
-  console.log(file);
-
   const reader = new FileReader();
-
   reader.onload = (e) => {
     const csv = e.target.result;
     const data = d3.csvParse(csv);
@@ -408,13 +404,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     return d;
   }).then((data) => {
-    console.log(data);
     processData(data);
   });
 
   const browseButton = document.querySelector('#browse');
   browseButton.addEventListener('change', (evt) => {
-    //evt.preventDefault();
     handleFileSelect(evt);
   });
 
