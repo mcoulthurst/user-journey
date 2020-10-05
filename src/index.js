@@ -140,10 +140,9 @@ function drawCurves(arr){
 }
 
 function drawJourney(arr) {
-
-  var wrap;
+  const fill ='#4D4844';
   // create a text wrapping function
-  wrap = d3.textwrap()
+  const wrap = d3.textwrap()
     // wrap to 480 x 960 pixels
     .bounds({height: 100, width: 100})
     // wrap with tspans in all browsers
@@ -171,7 +170,7 @@ function drawJourney(arr) {
   g.append('text')
   .attr('transform', (d, i) => `translate(${i * box.width + 50}, ${20})`)
   .attr('class', 'block')
-  .attr('fill', '#333')
+  .attr('fill', fill)
   .attr('stroke', 'none')
   .attr('font-size', 10)
   .attr('y', (d) => {
@@ -184,7 +183,7 @@ function drawJourney(arr) {
   .attr('width', box.width)
   .attr('height', box.width)
   .attr('font-family', 'Montserrat')
-  .attr('font-weight',100)
+  .attr('font-weight', 200)
   .text((d) => {
     //var txt = d['Touch points'];
     //txt = txt.split('|').join('\n\n');
@@ -195,7 +194,7 @@ function drawJourney(arr) {
   g.append('text')
   .attr('transform', (d, i) => `translate(${i * box.width + 50}, ${380})`)
   .attr('class', 'block')
-  .attr('fill', '#333')
+  .attr('fill', fill)
   .attr('stroke', 'none')
   .attr('font-size', 12)
   .attr('width', box.width)
@@ -211,7 +210,7 @@ function drawJourney(arr) {
   g.append('text')
   .attr('transform', (d, i) => `translate(${i * box.width + 50}, ${530})`)
   .attr('class', 'block')
-  .attr('fill', '#333')
+  .attr('fill', fill)
   .attr('stroke', 'none')
   .attr('font-size', 12)
   .attr('width', box.width)
@@ -228,25 +227,16 @@ function drawJourney(arr) {
 }
 
 function initSVG() {
-  /* 
-  svg = d3
-    .select("#chart")
-    .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-    .attr("margin-left", margin.left + "px")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
- */
   svg.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 }
 
 function layout(){
-  const fill = '#e3e3e3';
+  const fill = '#F5F6F8';
 
   svg.append('svg:rect')
     .attr('height', 310)
     .attr('width', width)
-    .attr('fill', '#e3e3e3')
+    .attr('fill', fill)
     .attr('x', 0)
     .attr('y', 0);
 
