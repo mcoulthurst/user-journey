@@ -21,26 +21,6 @@ const canv = document.querySelector('#canv');
 const ctx = canv.getContext('2d');
 const box = { width: 120 };
 
-function processData(arr) {
-  console.log(arr);
- /* 
- if (arr.length < 6) {
-    // showError('Not enough Data');
-  } else if (arr.length > 20) {
-    // showError('Too Many Rows');
-  } else {
-    // drawSidePanel(arr.slice(0,5));
-    // drawJourney(arr.slice(5));
-
-    drawJourney(arr);
-    drawCurves(arr);
-  }
- */
-  
-  drawJourney(arr);
-  drawCurves(arr);
-}
-
 function drawCurves(arr) {
   const lines = [];
   let xPos;
@@ -60,6 +40,7 @@ function drawCurves(arr) {
   g.append('path')
     .attr('d', lineFunction(lines))
     .attr('stroke', '#333')
+    .attr('class', 'path')
     .attr('stroke-width', 1)
     .attr('stroke-dasharray', '2 , 5')
     .attr('fill', 'none');
@@ -69,21 +50,17 @@ function drawCurves(arr) {
     .enter()
     // add circles for emotions
     .append('svg:circle')
+    .attr('class', 'dots')
     .attr('r', 3)
     .attr('fill', '#000')
     .attr('stroke', '#000')
     .attr('rotation', 90)
     .attr(
-      'transform',
-      (d, i) =>
-        `translate(${i * box.width + 50}, ${
-          offset + 320 - d.Emotion * 3
-        }) rotate(45 0 0) `
+      'transform', (d, i) => `translate(${i * box.width + 50}, ${offset + 320 - d.Emotion * 3}) rotate(45 0 0) `,
     );
 }
 
 function drawJourney(arr) {
-  console.log(arr);
   const fill = '#4D4844';
   // create a text wrapping function
   const wrap = d3
@@ -108,7 +85,7 @@ function drawJourney(arr) {
   g.append('text')
     .attr(
       'transform',
-      (d, i) => `translate(${i * box.width + 50}, ${offset + 340})`
+      (d, i) => `translate(${i * box.width + 50}, ${offset + 340})`,
     )
     .attr('class', 'title')
     .attr('fill', '#fff')
@@ -123,7 +100,7 @@ function drawJourney(arr) {
   g.append('text')
     .attr(
       'transform',
-      (d, i) => `translate(${i * box.width + 50}, ${offset + 20})`
+      (d, i) => `translate(${i * box.width + 50}, ${offset + 20})`,
     )
     .attr('class', 'block')
     .attr('fill', fill)
@@ -146,7 +123,7 @@ function drawJourney(arr) {
   g.append('text')
     .attr(
       'transform',
-      (d, i) => `translate(${i * box.width + 50}, ${offset + 380})`
+      (d, i) => `translate(${i * box.width + 50}, ${offset + 380})`,
     )
     .attr('class', 'block')
     .attr('fill', fill)
@@ -161,7 +138,7 @@ function drawJourney(arr) {
   g.append('text')
     .attr(
       'transform',
-      (d, i) => `translate(${i * box.width + 50}, ${offset + 530})`
+      (d, i) => `translate(${i * box.width + 50}, ${offset + 530})`,
     )
     .attr('class', 'block')
     .attr('fill', fill)
@@ -307,11 +284,19 @@ function layout() {
     .text('Opportunities'.toUpperCase());
 }
 
+function clearSVG() {
+  svg.selectAll('text').remove();
+  svg.selectAll('block').remove();
+
+  svg.select('.path').remove();
+  svg.selectAll('.dots').remove();
+}
+
 function download(filename, text) {
   const pom = document.createElement('a');
   pom.setAttribute(
     'href',
-    `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`
+    `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`,
   );
   pom.setAttribute('download', filename);
 
@@ -324,6 +309,28 @@ function download(filename, text) {
   }
 }
 
+function processData(arr) {
+  console.log(arr);
+  /*
+ if (arr.length < 6) {
+    // showError('Not enough Data');
+  } else if (arr.length > 20) {
+    // showError('Too Many Rows');
+  } else {
+    // drawSidePanel(arr.slice(0,5));
+    // drawJourney(arr.slice(5));
+
+    drawJourney(arr);
+    drawCurves(arr);
+  }
+ */
+  clearSVG();
+  layout();
+
+  drawJourney(arr);
+  drawCurves(arr);
+}
+
 const canvasSetup = () => {
   const chart = document.querySelector('#chart');
   const data = chart.outerHTML;
@@ -333,36 +340,20 @@ const canvasSetup = () => {
 };
 
 function handleFileSelect(evt) {
-  const { files } = evt.target; // FileList object
+  const file = evt.target.files[0];
+  // Only process text files.
+  console.log(file);
 
-  // Loop through the FileList and render image files as thumbnails.
-  for (var i = 0, f; (f = files[i]); i++) {
-    let f = files[i];
-    console.log(f);
-    /*
-      // Only process text files.
+  const reader = new FileReader();
 
-      // (except on windows where they are application/vnd.ms-excel)
-      if (!f.type.match('text/csv')) {
-         continue;
-      }
-      */
+  reader.onload = (e) => {
+    const csv = e.target.result;
+    const data = d3.csvParse(csv);
+    processData(data);
+  };
 
-    var reader = new FileReader();
-
-    // Closure to capture the file information.
-    reader.onload = (function (theFile) {
-      return function (e) {
-        const csv = e.target.result;
-        const data = d3.csvParse(csv)
-        console.log(data);
-        processData(data);
-      };
-    })(f);
-
-    // Read in the file data as text string.
-    reader.readAsText(f);
-  }
+  // Read in the file data as text string.
+  reader.readAsText(file);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
