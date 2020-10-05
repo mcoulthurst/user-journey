@@ -39,7 +39,7 @@ function drawCurves(arr) {
   let pt;
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < arr.length; i++) {
-    yPos = offset + 320 - arr[i].Emotion * 30;
+    yPos = offset + 320 - arr[i].Emotion * 3;
     xPos = i * 120 + 50;
     pt = [xPos, yPos];
     lines.push(pt);
@@ -66,7 +66,7 @@ function drawCurves(arr) {
     .attr('rotation', 90)
     .attr(
       'transform',
-      (d, i) => `translate(${i * box.width + 50}, ${offset + 320 - d.Emotion * 30}) rotate(45 0 0) `,
+      (d, i) => `translate(${i * box.width + 50}, ${offset + 320 - d.Emotion * 3}) rotate(45 0 0) `,
     );
 }
 
@@ -79,6 +79,18 @@ function drawJourney(arr) {
     .method('tspans'); // wrap with tspans in all browsers
 
   const g = svg.selectAll('.title').data(arr).enter().append('g');
+
+  g.append('text')
+    .attr('transform', () => `translate(${40}, ${50})`)
+    .attr('class', 'title')
+    .attr('fill', '#fff')
+    .attr('stroke', '#fff')
+    .attr('font-size', 32)
+    .attr('width', box.width)
+    .attr('font-family', 'Montserrat')
+    .attr('font-weight', 200)
+    .text((d) => d.Title.toUpperCase())
+    .attr('text-anchor', 'start');
 
   g.append('text')
     .attr('transform', (d, i) => `translate(${i * box.width + 50}, ${offset + 340})`)
@@ -100,7 +112,7 @@ function drawJourney(arr) {
     .attr('font-size', 10)
     .attr('y', (d) => {
       let textOffset = 0;
-      if (d.Emotion >= 5) {
+      if (d.Emotion >= 50) {
         textOffset = 200;
       }
       return textOffset;
