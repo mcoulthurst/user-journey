@@ -13,8 +13,9 @@ const margin = {
   bottom: 20,
   left: 20,
 };
-const width = 1200;
+let width = 1200;
 const offset = 90;
+const columnWidth = 120;
 
 const svg = d3.select('svg');
 const canv = document.querySelector('#canv');
@@ -116,7 +117,7 @@ function drawTextBlocks(arr) {
   g.append('text')
     .attr(
       'transform',
-      (d, i) => `translate(${i * box.width + 50}, ${offset + 340})`,
+      (d, i) => `translate(${i * box.width + 50}, ${offset + 341})`,
     )
     .attr('class', 'title')
     .attr('fill', '#fff')
@@ -191,7 +192,21 @@ function drawTextBlocks(arr) {
 }
 
 function initSVG() {
-  svg.attr('transform', `translate(${margin.left}, ${margin.top})`);
+  svg
+    .attr('width', width)
+    .attr('viewBox', `0 0 ${width} 800`)
+    .attr('transform', `translate(${margin.left}, ${margin.top})`);
+  // also set canvas width for png
+  d3.select('#canv').attr('width', width);
+}
+
+function clearSVG() {
+  svg.selectAll('text').remove();
+  svg.selectAll('block').remove();
+
+  svg.select('.path').remove();
+  svg.select('.lines').remove();
+  svg.selectAll('.dots').remove();
 }
 
 function layout() {
@@ -319,15 +334,6 @@ function layout() {
     .text(titles[5].toUpperCase());
 }
 
-function clearSVG() {
-  svg.selectAll('text').remove();
-  svg.selectAll('block').remove();
-
-  svg.select('.path').remove();
-  svg.select('.lines').remove();
-  svg.selectAll('.dots').remove();
-}
-
 function download(filename, text) {
   const pom = document.createElement('a');
   pom.setAttribute(
@@ -346,12 +352,11 @@ function download(filename, text) {
 }
 
 function processData(txt) {
-  console.log(txt);
   const arr = d3.csvParseRows(txt);
   // get first row for field titles
   titles = arr.shift();
-  console.log(titles);
-  console.log(arr);
+  width = arr.length * columnWidth;
+  initSVG();
   clearSVG();
   layout();
 
@@ -373,7 +378,6 @@ function handleFileSelect(evt) {
   const reader = new FileReader();
   reader.onload = (e) => {
     const csv = e.target.result;
-    
     processData(csv);
   };
 
@@ -401,21 +405,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // get the file contents as text so we can extract the header later
   d3.text(URL).then((txt) => processData(txt));
 
-
-/* 
-  d3.dsv(',', URL, (d) => {
-    console.log(d);
-
-    return d;
-  }).then((data) => {
-    processData(data);
-  });
- */
   const browseButton = document.querySelector('#browse');
   browseButton.addEventListener('change', (evt) => {
     handleFileSelect(evt);
   });
-
-  initSVG();
-  //layout();
 });
