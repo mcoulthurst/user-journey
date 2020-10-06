@@ -174,7 +174,7 @@ function drawTextBlocks(arr) {
   g.append('text')
     .attr(
       'transform',
-      (d, i) => `translate(${i * box.width + 50}, ${offset + 530})`,
+      (d, i) => `translate(${i * box.width + 50}, ${offset + 540})`,
     )
     .attr('class', 'block')
     .attr('fill', fill)
@@ -268,7 +268,7 @@ function layout() {
     .attr('y', yPos);
 
   yPos += rowHt + gutter;
-  rowHt = 140;
+  rowHt = 150;
   svg
     .append('svg:rect')
     .attr('height', rowHt)
