@@ -28,7 +28,6 @@ const textLight = '#FFFFFF';
 const textDark = '#4D4844';
 const bgGrey = '#F5F6F8';
 
-
 function drawCurves(arr) {
   const lines = [];
   let xPos;
