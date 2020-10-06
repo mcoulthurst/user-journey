@@ -5,7 +5,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   mode: 'development',
-  entry: './src/index.js', 
+  entry: './src/index.js',
   output: {
     filename: 'main.js',
     path: path.resolve(__dirname, 'dist'),
@@ -26,7 +26,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'TITLE_GOES_HERE',
       filename: 'index.html',
-      template: 'src/index.html'
+      template: 'src/index.html',
     }),
   ],
   module: {
