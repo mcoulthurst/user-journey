@@ -20,6 +20,7 @@ const svg = d3.select('svg');
 const canv = document.querySelector('#canv');
 const ctx = canv.getContext('2d');
 const box = { width: 120 };
+let titles = [];
 
 function drawCurves(arr) {
   const lines = [];
@@ -28,7 +29,7 @@ function drawCurves(arr) {
   let pt;
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < arr.length; i++) {
-    yPos = offset + 320 - arr[i].Emotion * 3;
+    yPos = offset + 320 - arr[i][2] * 3; // use the 'emotion' value contained in column 2
     xPos = i * 120 + 50;
     pt = [xPos, yPos];
     lines.push(pt);
@@ -56,7 +57,7 @@ function drawCurves(arr) {
     .attr('fill', '#4D4844')
     .attr('stroke', '#4D4844')
     .attr(
-      'transform', (d, i) => `translate(${i * box.width + 50}, ${offset + 320 - d.Emotion * 3})`,
+      'transform', (d, i) => `translate(${i * box.width + 50}, ${offset + 320 - d[2] * 3})`,
     );
   // add line for links to notes
   node.append('svg:line')
@@ -67,16 +68,16 @@ function drawCurves(arr) {
       if (textBlock.children.length > 1) {
         textOffset = offset + (textBlock.children.length - 1) * 10 + 26;
       } else if (textBlock.children.length === 1) {
-        textOffset = offset + 320 - d.Emotion * 3;
+        textOffset = offset + 320 - d[2] * 3;
       }
-      if (d.Emotion >= 50) {
-        textOffset = offset + 320 - d.Emotion * 3;
+      if (d[2] >= 50) {
+        textOffset = offset + 320 - d[2] * 3;
       }
       return textOffset;
     })
     .attr('y2', (d) => {
-      let textOffset = offset + 320 - d.Emotion * 3;
-      if (d.Emotion >= 50) {
+      let textOffset = offset + 320 - d[2] * 3;
+      if (d[2] >= 50) {
         textOffset = offset + 204;
       }
       return textOffset;
@@ -108,7 +109,7 @@ function drawTextBlocks(arr) {
     .attr('width', box.width)
     .attr('font-family', 'Montserrat')
     .attr('font-weight', 200)
-    .text((d) => d.Title.toUpperCase())
+    .text((d) => d[0].toUpperCase())
     .attr('text-anchor', 'start');
 
   // TASKS
@@ -124,7 +125,7 @@ function drawTextBlocks(arr) {
     .attr('width', box.width)
     .attr('font-family', 'Montserrat')
     .attr('font-weight', 'normal')
-    .text((d) => d.Tasks.toUpperCase())
+    .text((d) => d[1].toUpperCase())
     .attr('text-anchor', 'start');
 
   // TOUCH POINTS
@@ -140,7 +141,7 @@ function drawTextBlocks(arr) {
     .attr('font-size', 10)
     .attr('y', (d) => {
       let textOffset = 0;
-      if (d.Emotion >= 50) {
+      if (d[2] >= 50) {
         textOffset = 200;
       }
       return textOffset;
@@ -149,7 +150,7 @@ function drawTextBlocks(arr) {
     .attr('height', box.width)
     .attr('font-family', 'Montserrat')
     .attr('font-weight', 'normal')
-    .text((d) => d['Touch points'])
+    .text((d) => d[3])
     .attr('text-anchor', 'start');
 
   // NOTES
@@ -165,7 +166,7 @@ function drawTextBlocks(arr) {
     .attr('width', box.width)
     .attr('font-family', 'Montserrat')
     .attr('font-weight', 'normal')
-    .text((d) => d.Notes)
+    .text((d) => d[4])
     .attr('text-anchor', 'start');
 
   // OPPORTUNITES
@@ -181,7 +182,7 @@ function drawTextBlocks(arr) {
     .attr('width', box.width)
     .attr('font-family', 'Montserrat')
     .attr('font-weight', 'normal')
-    .text((d) => d.Opportunities)
+    .text((d) => d[5])
     .attr('text-anchor', 'start');
 
   const text = d3.selectAll('.block');
@@ -239,7 +240,7 @@ function layout() {
     .attr('font-family', 'Montserrat')
     .attr('font-weight', 400)
     .attr('text-anchor', 'middle')
-    .text('Touch points'.toUpperCase());
+    .text(titles[3].toUpperCase());
 
   yPos += rowHt + gutter;
   rowHt = 30;
@@ -281,7 +282,7 @@ function layout() {
     .attr('font-weight', 400)
     .attr('text-anchor', 'middle')
     .attr('font-family', 'Montserrat')
-    .text('Notes'.toUpperCase());
+    .text(titles[4].toUpperCase());
 
   yPos += rowHt + gutter;
   rowHt = 150;
@@ -315,7 +316,7 @@ function layout() {
     .attr('font-family', 'Montserrat')
     .attr('font-weight', 400)
     .attr('text-anchor', 'middle')
-    .text('Opportunities'.toUpperCase());
+    .text(titles[5].toUpperCase());
 }
 
 function clearSVG() {
@@ -344,20 +345,13 @@ function download(filename, text) {
   }
 }
 
-function processData(arr) {
-  /*
- if (arr.length < 6) {
-    // showError('Not enough Data');
-  } else if (arr.length > 20) {
-    // showError('Too Many Rows');
-  } else {
-    // drawSidePanel(arr.slice(0,5));
-    // drawTextBlocks(arr.slice(5));
-
-    drawTextBlocks(arr);
-    drawCurves(arr);
-  }
- */
+function processData(txt) {
+  console.log(txt);
+  const arr = d3.csvParseRows(txt);
+  // get first row for field titles
+  titles = arr.shift();
+  console.log(titles);
+  console.log(arr);
   clearSVG();
   layout();
 
@@ -379,8 +373,8 @@ function handleFileSelect(evt) {
   const reader = new FileReader();
   reader.onload = (e) => {
     const csv = e.target.result;
-    const data = d3.csvParse(csv);
-    processData(data);
+    
+    processData(csv);
   };
 
   // Read in the file data as text string.
@@ -404,6 +398,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // get the file contents as text so we can extract the header later
+  d3.text(URL).then((txt) => processData(txt));
+
+
+/* 
   d3.dsv(',', URL, (d) => {
     console.log(d);
 
@@ -411,12 +410,12 @@ document.addEventListener('DOMContentLoaded', () => {
   }).then((data) => {
     processData(data);
   });
-
+ */
   const browseButton = document.querySelector('#browse');
   browseButton.addEventListener('change', (evt) => {
     handleFileSelect(evt);
   });
 
   initSVG();
-  layout();
+  //layout();
 });
