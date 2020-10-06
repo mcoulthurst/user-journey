@@ -20,8 +20,14 @@ const columnWidth = 120;
 const svg = d3.select('svg');
 const canv = document.querySelector('#canv');
 const ctx = canv.getContext('2d');
+
 const box = { width: 120 };
 let titles = [];
+const colorScheme = ['#F15159', '#4D4844', '#32BBB9', '#A7488C', '#DFB164'];
+const textLight = '#FFFFFF';
+const textDark = '#4D4844';
+const bgGrey = '#F5F6F8';
+
 
 function drawCurves(arr) {
   const lines = [];
@@ -41,7 +47,7 @@ function drawCurves(arr) {
 
   g.append('path')
     .attr('d', lineFunction(lines))
-    .attr('stroke', '#333')
+    .attr('stroke', textDark)
     .attr('class', 'path')
     .attr('stroke-width', 1)
     .attr('stroke-dasharray', '2 , 5')
@@ -55,8 +61,8 @@ function drawCurves(arr) {
   node.append('svg:circle')
     .attr('class', 'dots')
     .attr('r', 3)
-    .attr('fill', '#4D4844')
-    .attr('stroke', '#4D4844')
+    .attr('fill', textDark)
+    .attr('stroke', textDark)
     .attr(
       'transform', (d, i) => `translate(${i * box.width + 50}, ${offset + 320 - d[2] * 3})`,
     );
@@ -87,11 +93,11 @@ function drawCurves(arr) {
     .attr('x2', (d, i) => (i * box.width + 50))
     .attr('stroke-width', 0.5)
     .attr('stroke-opacity', 0.5)
-    .attr('stroke', '#4D4844');
+    .attr('stroke', textDark);
 }
 
 function drawTextBlocks(arr) {
-  const fill = '#4D4844';
+  const fill = textDark;
   // create a text wrapping function
   const wrap = d3
     .textwrap()
@@ -104,8 +110,8 @@ function drawTextBlocks(arr) {
   g.append('text')
     .attr('transform', () => `translate(${40}, ${50})`)
     .attr('class', 'title')
-    .attr('fill', '#fff')
-    .attr('stroke', '#fff')
+    .attr('fill', textLight)
+    .attr('stroke', textLight)
     .attr('font-size', 32)
     .attr('width', box.width)
     .attr('font-family', 'Montserrat')
@@ -120,8 +126,8 @@ function drawTextBlocks(arr) {
       (d, i) => `translate(${i * box.width + 50}, ${offset + 341})`,
     )
     .attr('class', 'title')
-    .attr('fill', '#fff')
-    .attr('stroke', '#fff')
+    .attr('fill', textLight)
+    .attr('stroke', textLight)
     .attr('font-size', 18)
     .attr('width', box.width)
     .attr('font-family', 'Montserrat')
@@ -210,7 +216,7 @@ function clearSVG() {
 }
 
 function layout() {
-  const fill = '#F5F6F8';
+  const fill = bgGrey;
   const gutter = 10;
   let rowHt = 80;
   let yPos = 0;
@@ -219,7 +225,7 @@ function layout() {
     .append('svg:rect')
     .attr('height', rowHt)
     .attr('width', width)
-    .attr('fill', '#F15159')
+    .attr('fill', colorScheme[0])
     .attr('x', 0)
     .attr('y', yPos);
 
@@ -237,7 +243,7 @@ function layout() {
     .append('svg:rect')
     .attr('height', rowHt)
     .attr('width', 20)
-    .attr('fill', '#4D4844')
+    .attr('fill', colorScheme[1])
     .attr('x', 0)
     .attr('y', yPos);
 
@@ -249,7 +255,7 @@ function layout() {
       return `translate(${xText}, ${yText}) rotate(270)`;
     })
     .attr('class', 'subtitle')
-    .attr('fill', '#eee')
+    .attr('fill', textLight)
     .attr('stroke', 'none')
     .attr('font-size', 12)
     .attr('font-family', 'Montserrat')
@@ -263,7 +269,7 @@ function layout() {
     .append('svg:rect')
     .attr('height', rowHt)
     .attr('width', width)
-    .attr('fill', '#32BBB9')
+    .attr('fill', colorScheme[2])
     .attr('x', 0)
     .attr('y', yPos);
 
@@ -280,7 +286,7 @@ function layout() {
     .append('svg:rect')
     .attr('height', rowHt)
     .attr('width', 20)
-    .attr('fill', '#A7488C')
+    .attr('fill', colorScheme[3])
     .attr('x', 0)
     .attr('y', yPos);
   svg
@@ -291,7 +297,7 @@ function layout() {
       return `translate(${xText}, ${yText}) rotate(270)`;
     })
     .attr('class', 'subtitle')
-    .attr('fill', '#eee')
+    .attr('fill', textLight)
     .attr('stroke', 'none')
     .attr('font-size', 12)
     .attr('font-weight', 400)
@@ -313,7 +319,7 @@ function layout() {
     .append('svg:rect')
     .attr('height', rowHt)
     .attr('width', 20)
-    .attr('fill', '#DFB164')
+    .attr('fill', colorScheme[4])
     .attr('x', 0)
     .attr('y', yPos);
 
@@ -325,7 +331,7 @@ function layout() {
       return `translate(${xText}, ${yText}) rotate(270)`;
     })
     .attr('class', 'subtitle')
-    .attr('fill', '#333')
+    .attr('fill', textDark)
     .attr('stroke', 'none')
     .attr('font-size', 12)
     .attr('font-family', 'Montserrat')
@@ -374,7 +380,7 @@ const canvasSetup = () => {
 
 function handleFileSelect(evt) {
   const file = evt.target.files[0];
-  // Only process text files.
+
   const reader = new FileReader();
   reader.onload = (e) => {
     const csv = e.target.result;
@@ -387,7 +393,6 @@ function handleFileSelect(evt) {
 
 document.addEventListener('DOMContentLoaded', () => {
   const downloadSvgButton = document.querySelector('#download-svg-button');
-
   downloadSvgButton.addEventListener('click', () => {
     const chart = document.querySelector('#chart');
     const data = chart.outerHTML;
@@ -402,11 +407,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // get the file contents as text so we can extract the header later
-  d3.text(URL).then((txt) => processData(txt));
-
   const browseButton = document.querySelector('#browse');
   browseButton.addEventListener('change', (evt) => {
     handleFileSelect(evt);
   });
+
+  // get the file contents as text so we can extract the header for use later
+  d3.text(URL).then((txt) => processData(txt));
 });
