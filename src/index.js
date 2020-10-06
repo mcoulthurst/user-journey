@@ -23,7 +23,8 @@ const ctx = canv.getContext('2d');
 
 const box = { width: 120 };
 let titles = [];
-const colorScheme = ['#F15159', '#4D4844', '#32BBB9', '#A7488C', '#DFB164'];
+//const colorScheme = ['#F15159', '#4D4844', '#32BBB9', '#A7488C', '#DFB164'];
+const colorScheme = ['#005EA5', '#4c2c92', '#005ea5', '#2b8cc4', '#d53880'];
 const textLight = '#FFFFFF';
 const textDark = '#4D4844';
 const bgGrey = '#F5F6F8';
@@ -330,7 +331,7 @@ function layout() {
       return `translate(${xText}, ${yText}) rotate(270)`;
     })
     .attr('class', 'subtitle')
-    .attr('fill', textDark)
+    .attr('fill', textLight)
     .attr('stroke', 'none')
     .attr('font-size', 12)
     .attr('font-family', 'Montserrat')
