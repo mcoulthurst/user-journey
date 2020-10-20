@@ -23,8 +23,7 @@ const ctx = canv.getContext('2d');
 
 const box = { width: 120 };
 let titles = [];
-//const colorScheme = ['#F15159', '#4D4844', '#32BBB9', '#A7488C', '#DFB164'];
-const colorScheme = ['#2C5B89', '#4D4844', '#2C5B89', '#A8BD3A', '#7a892a'];
+const colorScheme = ['#2C5B89', '#4D4844', '#2C5B89', '#2393CF', '#3A81BA'];
 const textLight = '#FFFFFF';
 const textDark = '#4D4844';
 const bgGrey = '#F5F6F8';
@@ -84,7 +83,7 @@ function drawCurves(arr) {
     })
     .attr('y2', (d) => {
       let textOffset = offset + 320 - d[2] * 3;
-      if (d[2] >= 50) {
+      if (d[2] >= 50 && d[3] !== '') { // also catch nodes without text (set y1 and y2 the same so no line is drawn)
         textOffset = offset + 204;
       }
       return textOffset;
