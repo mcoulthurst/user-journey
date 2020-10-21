@@ -23,7 +23,7 @@ const ctx = canv.getContext('2d');
 
 const box = { width: 120 };
 let titles = [];
-const colorScheme = ['#2C5B89', '#4D4844', '#2C5B89', '#2393CF', '#3A81BA'];
+let colorScheme = ['#2C5B89', '#4D4844', '#2C5B89', '#2393CF', '#3A81BA'];
 const textLight = '#FFFFFF';
 const textDark = '#4D4844';
 const bgGrey = '#F5F6F8';
@@ -356,8 +356,44 @@ function download(filename, text) {
   }
 }
 
+function transposeCSV(arr) {
+  const newArray = arr;
+  const len = arr.length;
+  let i = 0;
+  let j = 0;
+
+  titles = ['Title'];
+  colorScheme = [];
+  for (i = 1; i < len; i++){
+    console.log(arr[i]);
+    titles.push(arr[i][0]);
+    //ignore scroe
+    if(arr[i][0]!=='SCORE'){
+      colorScheme.push(arr[i][1]);
+    }
+    let rowLength = arr[i].length;
+    let row = [];
+/*     for (j = 1; j < rowLength; j++){
+      row.push
+    } */
+    newArray.push()
+  }
+  console.log(titles);
+  console.log(colorScheme);
+  return newArray;
+}
+
 function processData(txt) {
-  const arr = d3.csvParseRows(txt);
+  let arr = d3.csvParseRows(txt);
+  console.log(arr);
+
+  // check for cell orientation in csv
+  if (arr[0][2] === '') {
+    console.log('transposed');
+    arr = transposeCSV(arr);
+  }else{
+    console.log('original');
+  }
   // get first row for field titles
   titles = arr.shift();
   width = arr.length * columnWidth;
