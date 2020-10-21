@@ -18,6 +18,8 @@ let width = 1200;
 let height = 800;
 const offset = 90;
 const columnWidth = 120;
+let yPos = 0;
+let scoreNoteIndex = 0;
 
 const svg = d3.select('svg');
 const canv = document.querySelector('#canv');
@@ -25,10 +27,14 @@ const ctx = canv.getContext('2d');
 
 const box = { width: 120 };
 let titles = [];
+const rowPos = [];
+const rowHt = [];
+const scores = [];
 let colorScheme = ['#2C5B89', '#4D4844', '#2C5B89', '#2393CF', '#3A81BA'];
 const textLight = '#FFFFFF';
 const textDark = '#4D4844';
 const bgGrey = '#F5F6F8';
+const gutter = 10;
 
 function drawCurves(arr) {
   const lines = [];
@@ -97,11 +103,24 @@ function drawCurves(arr) {
     .attr('stroke', textDark);
 }
 
+function getHeight(str) {
+  const baseHt = 150;
+  console.log(str);
+  let ht = baseHt;
+  if (str === 'V1.1') {
+    ht = 80;
+  }
+  if (str === 'SCORE') {
+    ht = 320;
+  }
+  if (str === 'TITLE_BLOCK') {
+    ht = 30;
+  }
+  return ht;
+}
+
 function drawRow(arr) {
   const fill = bgGrey;
-  const gutter = 10;
-  const rowHt = 150;
-
   // create a text wrapping function
   const wrap = d3
     .textwrap()
@@ -114,12 +133,12 @@ function drawRow(arr) {
     .append('g')
     .attr(
       'transform',
-      (d, i) => `translate(0, ${i * (rowHt + gutter)})`,
+      (d, i) => `translate(0, ${rowPos[i]})`,
     );
 
   g
     .append('svg:rect')
-    .attr('height', rowHt)
+    .attr('height', (d, i) => rowHt[i])
     .attr('width', width)
     .attr('fill', fill)
     .attr('x', 0)
@@ -127,15 +146,15 @@ function drawRow(arr) {
 
   g
     .append('svg:rect')
-    .attr('height', rowHt)
+    .attr('height', (d, i) => rowHt[i])
     .attr('width', 20)
     .attr('fill', (d, i) => colorScheme[i])
     .attr('x', 0)
     .attr('y', 0);
 
   g.selectAll('.notes')
-    .data(function (d,i) { 
-      console.log(d[i]);
+    .data((d, i) => {
+      console.log(yPos);
       return d;
     })
     .enter()
@@ -439,30 +458,48 @@ function transposeCSV(arr) {
   const row = [];
   titles = [];
   colorScheme = [];
+  let yPos = 0;
+  let thisRow = -1;
   // eslint-disable-next-line no-plusplus
   for (i = 0; i < len; i++) {
+/*     if (!row[i]) {
+      row[i] = [];
+    } */
     titles.push(arr[i][0]);
     // ignore score
     if (arr[i][0] !== 'SCORE') {
+      row.push([]);
+      thisRow ++;
       colorScheme.push(arr[i][1]);
+    } else {
+      scoreNoteIndex = i + 1;
     }
-    if (!row[i]) {
-      row[i] = [];
-    }
+    // track the row height
+    const ht = getHeight(arr[i][0]);
+    rowHt.push(ht);
+    rowPos.push(yPos);
+    yPos += ht + gutter;
 
     const rowLength = arr[1].length;
     // eslint-disable-next-line no-plusplus
     for (j = 2; j < rowLength; j++) {
-      row[i].push(arr[i][j]);
+      // extract score to separate array
+      if (arr[i][0] !== 'SCORE') {
+        row[thisRow].push(arr[i][j]);
+      } else {
+        scores.push(+arr[i][j]);
+      }
     }
     console.log(row);
     //newArray.push(row);
   }
   newArray = row;
   // overwrite v1.1 with actual title
-  titles[0] = arr[0][2];
-  console.log(titles);
-  console.log(colorScheme);
+  //titles[0] = arr[0][2];
+  console.log(rowPos);
+  console.log(rowHt);
+  console.log(scores);
+  console.log(scoreNoteIndex);
   console.log(newArray);
   return newArray;
 }
@@ -475,14 +512,15 @@ function processData(txt) {
   if (arr[0][0] === 'V1.1') {
     console.log('transposed');
     arr = transposeCSV(arr);
-    width = arr[1].length * columnWidth;
+    width = arr[2].length * columnWidth;
     height = arr.length * 300;
-  }else{
+  } else {
     console.log('original');
     // get first row for field titles
     titles = arr.shift();
     width = arr.length * columnWidth;
   }
+  console.log(`----- ${width} ----`);
   console.log(arr);
 
   initSVG();
