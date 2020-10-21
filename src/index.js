@@ -6,7 +6,8 @@ import { textwrap } from 'd3-textwrap';
 
 const d3 = Object.assign(d3Base);
 d3.textwrap = textwrap;
-const URL = 'assets/data/test_shortened.csv';
+// const URL = 'assets/data/test_shortened.csv';
+const URL = 'assets/data/transposed.csv';
 const margin = {
   top: 20,
   right: 20,
@@ -14,6 +15,7 @@ const margin = {
   left: 20,
 };
 let width = 1200;
+let height = 800;
 const offset = 90;
 const columnWidth = 120;
 
@@ -93,6 +95,78 @@ function drawCurves(arr) {
     .attr('stroke-width', 0.5)
     .attr('stroke-opacity', 0.5)
     .attr('stroke', textDark);
+}
+
+function drawRow(arr) {
+  const fill = bgGrey;
+  const gutter = 10;
+  const rowHt = 150;
+
+  // create a text wrapping function
+  const wrap = d3
+    .textwrap()
+    .bounds({ height: 100, width: 100 }) // wrap to 480 x 960 pixels
+    .method('tspans'); // wrap with tspans in all browsers
+
+  const g = svg.selectAll('.title')
+    .data(arr)
+    .enter()
+    .append('g')
+    .attr(
+      'transform',
+      (d, i) => `translate(0, ${i * (rowHt + gutter)})`,
+    );
+
+  g
+    .append('svg:rect')
+    .attr('height', rowHt)
+    .attr('width', width)
+    .attr('fill', fill)
+    .attr('x', 0)
+    .attr('y', 0);
+
+  g
+    .append('svg:rect')
+    .attr('height', rowHt)
+    .attr('width', 20)
+    .attr('fill', (d, i) => colorScheme[i])
+    .attr('x', 0)
+    .attr('y', 0);
+
+  g.selectAll('.notes')
+    .data(function (d,i) { 
+      console.log(d[i]);
+      return d;
+    })
+    .enter()
+    .append('text')
+    .attr(
+      'transform',
+      (d, i) => `translate(${i * box.width + 50}, ${gutter})`,
+    )
+    .attr('id', (d, i) => `notes_${i}`)
+    .attr('class', 'block')
+    .attr('fill', textDark)
+    .attr('stroke', 'none')
+    .attr('font-size', 10)
+    .attr('y', (d) => {
+      console.log(d);
+      let textOffset = 0;
+      if (d[2] >= 50) {
+        textOffset = 200;
+      }
+      return textOffset;
+    })
+    .attr('width', box.width)
+    .attr('height', box.width)
+    .attr('font-family', 'Montserrat')
+    .attr('font-weight', 'normal')
+    .text((d) => d)
+    .attr('text-anchor', 'start');
+
+  const text = d3.selectAll('.block');
+  // run the text wrapping function on all text nodes
+  text.call(wrap);
 }
 
 function drawTextBlocks(arr) {
@@ -199,10 +273,11 @@ function drawTextBlocks(arr) {
 function initSVG() {
   svg
     .attr('width', width)
-    .attr('viewBox', `0 0 ${width} 800`)
+    .attr('height', height)
+    .attr('viewBox', `0 0 ${width} ${height}`)
     .attr('transform', `translate(${margin.left}, ${margin.top})`);
   // also set canvas width for png
-  d3.select('#canv').attr('width', width);
+  d3.select('#canv').attr('width', width).attr('height', height);
 }
 
 function clearSVG() {
@@ -357,29 +432,38 @@ function download(filename, text) {
 }
 
 function transposeCSV(arr) {
-  const newArray = arr;
+  let newArray = [];
   const len = arr.length;
   let i = 0;
   let j = 0;
-
-  titles = ['Title'];
+  const row = [];
+  titles = [];
   colorScheme = [];
-  for (i = 1; i < len; i++){
-    console.log(arr[i]);
+  // eslint-disable-next-line no-plusplus
+  for (i = 0; i < len; i++) {
     titles.push(arr[i][0]);
-    //ignore scroe
-    if(arr[i][0]!=='SCORE'){
+    // ignore score
+    if (arr[i][0] !== 'SCORE') {
       colorScheme.push(arr[i][1]);
     }
-    let rowLength = arr[i].length;
-    let row = [];
-/*     for (j = 1; j < rowLength; j++){
-      row.push
-    } */
-    newArray.push()
+    if (!row[i]) {
+      row[i] = [];
+    }
+
+    const rowLength = arr[1].length;
+    // eslint-disable-next-line no-plusplus
+    for (j = 2; j < rowLength; j++) {
+      row[i].push(arr[i][j]);
+    }
+    console.log(row);
+    //newArray.push(row);
   }
+  newArray = row;
+  // overwrite v1.1 with actual title
+  titles[0] = arr[0][2];
   console.log(titles);
   console.log(colorScheme);
+  console.log(newArray);
   return newArray;
 }
 
@@ -388,21 +472,26 @@ function processData(txt) {
   console.log(arr);
 
   // check for cell orientation in csv
-  if (arr[0][2] === '') {
+  if (arr[0][0] === 'V1.1') {
     console.log('transposed');
     arr = transposeCSV(arr);
+    width = arr[1].length * columnWidth;
+    height = arr.length * 300;
   }else{
     console.log('original');
+    // get first row for field titles
+    titles = arr.shift();
+    width = arr.length * columnWidth;
   }
-  // get first row for field titles
-  titles = arr.shift();
-  width = arr.length * columnWidth;
+  console.log(arr);
+
   initSVG();
   clearSVG();
-  layout();
+  //layout();
 
-  drawTextBlocks(arr);
-  drawCurves(arr);
+  drawRow(arr);
+  //drawTextBlocks(arr);
+  //drawCurves(arr);
 }
 
 const canvasSetup = () => {
