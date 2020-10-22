@@ -119,8 +119,6 @@ function drawCurves(arr) {
     .attr('class', 'lines')
     .attr('y1', (d, i) => {
       const textBlock = document.querySelector(`#notes_${i}`);
-      console.log(i, `#notes_${i}`);
-      // const textBlock = d3.selectAll(`.notes_${i}`);
       let textOffset = 10;
       if (textBlock.children.length > 0) {
         textOffset = offset + (textBlock.children.length - 1) * 10 + 18;
@@ -300,132 +298,7 @@ function clearSVG() {
   svg.selectAll('.lines').remove();
   svg.selectAll('.dots').remove();
 }
-/*
-function layout() {
-  const fill = bgGrey;
-  const gutter = 10;
-  let rowHt = 80;
-  let yPos = 0;
 
-  svg
-    .append('svg:rect')
-    .attr('height', rowHt)
-    .attr('width', width)
-    .attr('fill', colorScheme[0])
-    .attr('x', 0)
-    .attr('y', yPos);
-
-  yPos += rowHt + gutter;
-  rowHt = 310;
-  svg
-    .append('svg:rect')
-    .attr('height', rowHt)
-    .attr('width', width)
-    .attr('fill', fill)
-    .attr('x', 0)
-    .attr('y', yPos);
-
-  svg
-    .append('svg:rect')
-    .attr('height', rowHt)
-    .attr('width', 20)
-    .attr('fill', colorScheme[1])
-    .attr('x', 0)
-    .attr('y', yPos);
-
-  svg
-    .append('text')
-    .attr('transform', () => {
-      const xText = 15;
-      const yText = yPos + rowHt / 2;
-      return `translate(${xText}, ${yText}) rotate(270)`;
-    })
-    .attr('class', 'subtitle')
-    .attr('fill', textLight)
-    .attr('stroke', 'none')
-    .attr('font-size', 12)
-    .attr('font-family', 'Montserrat')
-    .attr('font-weight', 400)
-    .attr('text-anchor', 'middle')
-    .text(titles[3].toUpperCase());
-
-  yPos += rowHt + gutter;
-  rowHt = 30;
-  svg
-    .append('svg:rect')
-    .attr('height', rowHt)
-    .attr('width', width)
-    .attr('fill', colorScheme[2])
-    .attr('x', 0)
-    .attr('y', yPos);
-
-  yPos += rowHt + gutter;
-  rowHt = 150;
-  svg
-    .append('svg:rect')
-    .attr('height', rowHt)
-    .attr('width', width)
-    .attr('fill', fill)
-    .attr('x', 0)
-    .attr('y', yPos);
-  svg
-    .append('svg:rect')
-    .attr('height', rowHt)
-    .attr('width', 20)
-    .attr('fill', colorScheme[3])
-    .attr('x', 0)
-    .attr('y', yPos);
-  svg
-    .append('text')
-    .attr('transform', () => {
-      const xText = 15;
-      const yText = yPos + rowHt / 2;
-      return `translate(${xText}, ${yText}) rotate(270)`;
-    })
-    .attr('class', 'subtitle')
-    .attr('fill', textLight)
-    .attr('stroke', 'none')
-    .attr('font-size', 12)
-    .attr('font-weight', 400)
-    .attr('text-anchor', 'middle')
-    .attr('font-family', 'Montserrat')
-    .text(titles[4].toUpperCase());
-
-  yPos += rowHt + gutter;
-  rowHt = 150;
-  svg
-    .append('svg:rect')
-    .attr('height', rowHt)
-    .attr('width', width)
-    .attr('fill', fill)
-    .attr('x', 0)
-    .attr('y', yPos);
-
-  svg
-    .append('svg:rect')
-    .attr('height', rowHt)
-    .attr('width', 20)
-    .attr('fill', colorScheme[4])
-    .attr('x', 0)
-    .attr('y', yPos);
-
-  svg
-    .append('text')
-    .attr('transform', () => {
-      const xText = 15;
-      const yText = yPos + rowHt / 2;
-      return `translate(${xText}, ${yText}) rotate(270)`;
-    })
-    .attr('class', 'subtitle')
-    .attr('fill', textLight)
-    .attr('stroke', 'none')
-    .attr('font-size', 12)
-    .attr('font-family', 'Montserrat')
-    .attr('font-weight', 400)
-    .attr('text-anchor', 'middle')
-    .text(titles[5].toUpperCase());
-}
- */
 function download(filename, text) {
   const pom = document.createElement('a');
   pom.setAttribute(
@@ -500,14 +373,14 @@ function processData(txt) {
   if (arr[0][0] === 'V1.1') {
     console.log('transposed');
     arr = transposeCSV(arr);
-    width = arr[3].notes.length * columnWidth;
+    width = arr[3].notes.length * columnWidth + 100;
   } else {
     console.log('original');
     // get first row for field titles
     titles = arr.shift();
     width = arr.length * columnWidth;
   }
-  console.log(`----- ${width} ----`);
+  console.log(`----- ${width} , ${arr[3].notes.length} ----`);
   console.log(`final height ${height}`);
   console.log(arr);
 
