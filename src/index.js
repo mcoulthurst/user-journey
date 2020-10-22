@@ -18,7 +18,6 @@ let width = 1200;
 let height = 800;
 
 const columnWidth = 120;
-let yPos = 0;
 let scoreNoteIndex = 0;
 let subtitlesIndex = 0;
 let pageTitle = '';
@@ -32,7 +31,7 @@ let titles = [];
 let subtitles = [];
 let row = [];
 
-let colorScheme = ['#2C5B89', '#4D4844', '#2C5B89', '#2393CF', '#3A81BA'];
+const colorScheme = ['#2C5B89', '#4D4844', '#2C5B89', '#2393CF', '#3A81BA'];
 const textLight = '#FFFFFF';
 const textDark = '#4D4844';
 const bgGrey = '#F5F6F8';
@@ -46,17 +45,15 @@ const wrap = d3
 
 function drawCurves(arr) {
   const lines = [];
-  let xPos;
-  let yPos;
+
   let pt;
   const offset = 10;
 
   const data = arr[scoreNoteIndex];
-  console.log(data);
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < data.scores.length; i++) {
-    yPos = offset + 320 - data.scores[i] * 3; // use the 'emotion' value contained in column 2
-    xPos = i * 120 + 50;
+    const yPos = offset + 320 - data.scores[i] * 3; // use the 'emotion' value contained in column 2
+    const xPos = i * 120 + 50;
     pt = [xPos, yPos];
     lines.push(pt);
   }
@@ -167,7 +164,6 @@ function getHeight(str) {
 
 function drawRow(arr) {
   const fill = bgGrey;
-
 
   const g = svg.selectAll('.title')
     .data(arr)
@@ -283,107 +279,6 @@ function drawRow(arr) {
     .attr('font-weight', 200)
     .text(pageTitle.toUpperCase())
     .attr('text-anchor', 'start');
-}
-
-function drawTextBlocks(arr) {
-  const fill = textDark;
-  // create a text wrapping function
-  const wrap = d3
-    .textwrap()
-    .bounds({ height: 100, width: 100 }) // wrap to 480 x 960 pixels
-    .method('tspans'); // wrap with tspans in all browsers
-
-  const g = svg.selectAll('.title').data(arr).enter().append('g');
-
-  // TITLE
-  g.append('text')
-    .attr('transform', () => `translate(${40}, ${50})`)
-    .attr('class', 'title')
-    .attr('fill', textLight)
-    .attr('stroke', textLight)
-    .attr('font-size', 32)
-    .attr('width', box.width)
-    .attr('font-family', 'Montserrat')
-    .attr('font-weight', 200)
-    .text((d) => d[0].toUpperCase())
-    .attr('text-anchor', 'start');
-
-  // TASKS
-  g.append('text')
-    .attr(
-      'transform',
-      (d, i) => `translate(${i * box.width + 50}, ${offset + 341})`,
-    )
-    .attr('class', 'title')
-    .attr('fill', textLight)
-    .attr('stroke', textLight)
-    .attr('font-size', 18)
-    .attr('width', box.width)
-    .attr('font-family', 'Montserrat')
-    .attr('font-weight', 'normal')
-    .text((d) => d[1].toUpperCase())
-    .attr('text-anchor', 'start');
-
-  // TOUCH POINTS
-  g.append('text')
-    .attr(
-      'transform',
-      (d, i) => `translate(${i * box.width + 50}, ${offset + 20})`,
-    )
-    .attr('id', (d, i) => `notes_${i}`)
-    .attr('class', 'block')
-    .attr('fill', fill)
-    .attr('stroke', 'none')
-    .attr('font-size', 10)
-    .attr('y', (d) => {
-      let textOffset = 0;
-      if (d[2] >= 50) {
-        textOffset = 200;
-      }
-      return textOffset;
-    })
-    .attr('width', box.width)
-    .attr('height', box.width)
-    .attr('font-family', 'Montserrat')
-    .attr('font-weight', 'normal')
-    .text((d) => d[3])
-    .attr('text-anchor', 'start');
-
-  // NOTES
-  g.append('text')
-    .attr(
-      'transform',
-      (d, i) => `translate(${i * box.width + 50}, ${offset + 380})`,
-    )
-    .attr('class', 'block')
-    .attr('fill', fill)
-    .attr('stroke', 'none')
-    .attr('font-size', 12)
-    .attr('width', box.width)
-    .attr('font-family', 'Montserrat')
-    .attr('font-weight', 'normal')
-    .text((d) => d[4])
-    .attr('text-anchor', 'start');
-
-  // OPPORTUNITES
-  g.append('text')
-    .attr(
-      'transform',
-      (d, i) => `translate(${i * box.width + 50}, ${offset + 540})`,
-    )
-    .attr('class', 'block')
-    .attr('fill', fill)
-    .attr('stroke', 'none')
-    .attr('font-size', 12)
-    .attr('width', box.width)
-    .attr('font-family', 'Montserrat')
-    .attr('font-weight', 'normal')
-    .text((d) => d[5])
-    .attr('text-anchor', 'start');
-
-  const text = d3.selectAll('.block');
-  // run the text wrapping function on all text nodes
-  text.call(wrap);
 }
 
 function initSVG() {
@@ -573,11 +468,13 @@ function transposeCSV(arr) {
     rowObj.ht = ht;
     rowObj.yPos = yPos;
     yPos += ht + gutter;
+    rowObj.notes = arr[i].slice(2);
+
     if (arr[i][0] === 'TITLE_BLOCK') {
       subtitles = arr[i].slice(2);
       subtitlesIndex = row.length;
+      rowObj.notes = [];
     }
-    rowObj.notes = arr[i].slice(2);
 
     if (arr[i][0] === 'V1.1') {
       pageTitle = arr[i][2];
@@ -591,7 +488,7 @@ function transposeCSV(arr) {
     row.push(rowObj);
   }
   height = yPos;
-  
+
   console.log(row);
   return row;
 }
@@ -604,7 +501,6 @@ function processData(txt) {
     console.log('transposed');
     arr = transposeCSV(arr);
     width = arr[3].notes.length * columnWidth;
-    //height = arr.length * 300;
   } else {
     console.log('original');
     // get first row for field titles
