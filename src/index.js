@@ -128,13 +128,20 @@ function drawCurves(arr) {
       if (data.scores[i] >= 50) {
         textOffset = offset + 320 - d * 3;
       }
+      if (data.comments[i] === '') {
+        textOffset = 0;
+      }
+      console.log(data.scores[i], textOffset);
       return textOffset;
     })
     .attr('y2', (d, i) => {
       let textOffset = offset + 320 - d * 3;
-      if (data.scores[i] >= 50 && data.comments[i] !== '') {
-        // TODO catch nodes without text (set y1 and y2 the same so no line is drawn)
+      if (data.scores[i] >= 50 ) {
         textOffset = offset + 196;
+      }
+      // catch nodes without text (set y1 and y2 the same so no line is drawn)
+      if (data.comments[i] === '') {
+        textOffset = 0;
       }
       return textOffset;
     })
@@ -362,7 +369,6 @@ function transposeCSV(arr) {
   }
   height = yPos;
 
-  console.log(row);
   return row;
 }
 
@@ -371,18 +377,13 @@ function processData(txt) {
 
   // check for cell orientation in csv
   if (arr[0][0] === 'V1.1') {
-    console.log('transposed');
     arr = transposeCSV(arr);
     width = arr[3].notes.length * columnWidth + 100;
   } else {
-    console.log('original');
     // get first row for field titles
     titles = arr.shift();
     width = arr.length * columnWidth;
   }
-  console.log(`----- ${width} , ${arr[3].notes.length} ----`);
-  console.log(`final height ${height}`);
-  console.log(arr);
 
   initSVG();
   clearSVG();
