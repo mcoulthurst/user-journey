@@ -20,6 +20,7 @@ const offset = 90;
 const columnWidth = 120;
 let yPos = 0;
 let scoreNoteIndex = 0;
+let subtitlesIndex = 0;
 
 const svg = d3.select('svg');
 const canv = document.querySelector('#canv');
@@ -27,10 +28,9 @@ const ctx = canv.getContext('2d');
 
 const box = { width: 120 };
 let titles = [];
-const row = [];
-const rowPos = [];
-const rowHt = [];
-const scores = [];
+let subtitles = [];
+let row = [];
+
 let colorScheme = ['#2C5B89', '#4D4844', '#2C5B89', '#2393CF', '#3A81BA'];
 const textLight = '#FFFFFF';
 const textDark = '#4D4844';
@@ -106,7 +106,6 @@ function drawCurves(arr) {
 
 function getHeight(str) {
   const baseHt = 150;
-  console.log(str);
   let ht = baseHt;
   if (str === 'V1.1') {
     ht = 80;
@@ -132,45 +131,43 @@ function drawRow(arr) {
     .data(arr)
     .enter()
     .append('g')
-    .attr(
-      'transform',
-      (d, i) => `translate(0, ${d.yPos})`,
-    );
+    .attr('class', (d, i) => `row_${i}`)
+    .attr('transform', (d) => `translate(0, ${d.yPos})`);
 
-  g
-    .append('svg:rect')
-    .attr('height', (d, i) => d.ht)
+  g.append('svg:rect')
+    .attr('height', (d) => d.ht)
     .attr('width', width)
     .attr('fill', fill)
     .attr('x', 0)
     .attr('y', 0);
 
-  g
-    .append('svg:rect')
-    .attr('height', (d, i) => d.ht)
-    .attr('width', 20)
-    .attr('fill', (d, i) => d.color)
+  g.append('svg:rect')
+    .attr('height', (d) => d.ht)
+    .attr('width', (d) => {
+      let wd = 20;
+      if (d.title === 'V1.1' || d.title === 'TITLE_BLOCK') {
+        wd = width;
+      }
+      return wd;
+    })
+    .attr('fill', (d) => d.color)
     .attr('x', 0)
     .attr('y', 0);
 
   g.selectAll('.notes')
-    .data((d, i) => {
-      console.log(d);
-      return d.notes;
-    })
+    .data((d) => d.notes)
     .enter()
     .append('text')
     .attr(
       'transform',
       (d, i) => `translate(${i * box.width + 50}, ${gutter})`,
     )
-    .attr('id', (d, i) => `notes_${i}`)
+    .attr('id', (d, i) => `notes_${i + 1}`)
     .attr('class', 'block')
     .attr('fill', textDark)
     .attr('stroke', 'none')
     .attr('font-size', 10)
     .attr('y', (d) => {
-      console.log(d);
       let textOffset = 0;
       if (d[2] >= 50) {
         textOffset = 200;
@@ -187,6 +184,28 @@ function drawRow(arr) {
   const text = d3.selectAll('.block');
   // run the text wrapping function on all text nodes
   text.call(wrap);
+  console.log(row[2]);
+  // TITLE
+  svg.select(`.row_${subtitlesIndex}`)
+    .selectAll('.subtitles')
+    .data(subtitles)
+    .enter()
+    .append('text')
+    .attr(
+      'transform',
+      (d, i) => {
+        console.log(row[2]);
+        return `translate(${i * box.width + 50}, ${20})`},
+    )
+    .attr('class', 'subtitle')
+    .attr('fill', textLight)
+    .attr('stroke', textLight)
+    .attr('font-size', 18)
+    .attr('width', box.width)
+    .attr('font-family', 'Montserrat')
+    .attr('font-weight', 'normal')
+    .text((d) => d.toUpperCase())
+    .attr('text-anchor', 'start');
 }
 
 function drawTextBlocks(arr) {
@@ -452,81 +471,48 @@ function download(filename, text) {
 }
 
 function transposeCSV(arr) {
-  let newArray = [];
   const len = arr.length;
   let i = 0;
-  let j = 0;
-  const row = [];
   titles = [];
+  row = [];
   colorScheme = [];
   let yPos = 0;
-  let thisRow = -1;
 
   // eslint-disable-next-line no-plusplus
   for (i = 0; i < len; i++) {
     const rowObj = {};
-    //loop thru and create row objects
+    // loop thru and create row objects
+    const ht = getHeight(arr[i][0]);
     // when we find the scores create new object and add the notes to it
     if (arr[i][0] === 'SCORE') {
-      rowObj.scores = +arr[i].slice(2);
+      rowObj.scores = arr[i].slice(2);
+      scoreNoteIndex = i;
       i++;
     }
     rowObj.title = arr[i][0];
     rowObj.color = arr[i][1];
-    let ht = getHeight(arr[i][0]);
     rowObj.ht = ht;
     rowObj.yPos = yPos;
     yPos += ht + gutter;
-    rowObj.notes = arr[i].slice(2);
-/* 
-    titles.push(arr[i][0]);
-    // ignore score
-    if (arr[i][0] !== 'SCORE') {
-      row.push([]);
-      thisRow ++;
-      colorScheme.push(arr[i][1]);
-    } else {
-      scoreNoteIndex = i + 1;
+    if (arr[i][0] === 'TITLE_BLOCK') {
+      subtitles = arr[i].slice(2);
+      subtitlesIndex = row.length;
     }
-    // track the row height
-    const ht = getHeight(arr[i][0]);
-    rowHt.push(ht);
-    rowPos.push(yPos);
-    yPos += ht + gutter;
-
-    const rowLength = arr[1].length;
-    // eslint-disable-next-line no-plusplus
-    for (j = 2; j < rowLength; j++) {
-      // extract score to separate array
-      if (arr[i][0] !== 'SCORE') {
-        row[thisRow].push(arr[i][j]);
-      } else {
-        scores.push(+arr[i][j]);
-      }
-    } */
-    console.log(rowObj);
+    rowObj.notes = arr[i].slice(2);
     row.push(rowObj);
   }
-  //newArray = row;
-  // overwrite v1.1 with actual title
-  //titles[0] = arr[0][2];
-  console.log(rowPos);
-  console.log(rowHt);
-  console.log(scores);
-  console.log(scoreNoteIndex);
+
   console.log(row);
   return row;
 }
 
 function processData(txt) {
   let arr = d3.csvParseRows(txt);
-  console.log(arr);
 
   // check for cell orientation in csv
   if (arr[0][0] === 'V1.1') {
     console.log('transposed');
     arr = transposeCSV(arr);
-    console.log(arr);
     width = arr[0].notes.length * columnWidth;
     height = arr.length * 300;
   } else {
@@ -540,7 +526,6 @@ function processData(txt) {
 
   initSVG();
   clearSVG();
-  //layout();
 
   drawRow(arr);
   //drawTextBlocks(arr);
