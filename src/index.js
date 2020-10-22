@@ -590,7 +590,8 @@ function transposeCSV(arr) {
     }
     row.push(rowObj);
   }
-
+  height = yPos;
+  
   console.log(row);
   return row;
 }
@@ -603,7 +604,7 @@ function processData(txt) {
     console.log('transposed');
     arr = transposeCSV(arr);
     width = arr[3].notes.length * columnWidth;
-    height = arr.length * 300;
+    //height = arr.length * 300;
   } else {
     console.log('original');
     // get first row for field titles
@@ -611,6 +612,7 @@ function processData(txt) {
     width = arr.length * columnWidth;
   }
   console.log(`----- ${width} ----`);
+  console.log(`final height ${height}`);
   console.log(arr);
 
   initSVG();
