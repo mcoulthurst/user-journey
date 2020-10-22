@@ -21,6 +21,7 @@ const columnWidth = 120;
 let yPos = 0;
 let scoreNoteIndex = 0;
 let subtitlesIndex = 0;
+let pageTitle = '';
 
 const svg = d3.select('svg');
 const canv = document.querySelector('#canv');
@@ -42,9 +43,12 @@ function drawCurves(arr) {
   let xPos;
   let yPos;
   let pt;
+
+  const data = arr[scoreNoteIndex].scores;
+  console.log(data);
   // eslint-disable-next-line no-plusplus
-  for (let i = 0; i < arr.length; i++) {
-    yPos = offset + 320 - arr[i][2] * 3; // use the 'emotion' value contained in column 2
+  for (let i = 0; i < data.length; i++) {
+    yPos = offset + 320 - data[i] * 3; // use the 'emotion' value contained in column 2
     xPos = i * 120 + 50;
     pt = [xPos, yPos];
     lines.push(pt);
@@ -52,6 +56,33 @@ function drawCurves(arr) {
 
   const lineFunction = d3.line().curve(d3.curveCardinal);
   const g = svg.append('g').attr('id', 'curve');
+
+  g.selectAll('.notes')
+    .data(data)
+    .enter()
+    .append('text')
+    .attr(
+      'transform',
+      (d, i) => `translate(${i * box.width + 50}, ${gutter * 2})`,
+    )
+    .attr('id', (d, i) => `notes_${i + 1}`)
+    .attr('class', 'block')
+    .attr('fill', textDark)
+    .attr('stroke', 'none')
+    .attr('font-size', 10)
+    .attr('y', (d) => {
+      let textOffset = 0;
+      if (d >= 50) {
+        textOffset = 200;
+      }
+      return textOffset;
+    })
+    .attr('width', box.width)
+    .attr('height', box.width)
+    .attr('font-family', 'Montserrat')
+    .attr('font-weight', 'normal')
+    .text((d) => d)
+    .attr('text-anchor', 'start');
 
   g.append('path')
     .attr('d', lineFunction(lines))
@@ -62,7 +93,7 @@ function drawCurves(arr) {
     .attr('fill', 'none');
 
   const node = g.selectAll('.dots')
-    .data(arr)
+    .data(data)
     .enter();
 
   // add circles for emotions
@@ -72,27 +103,28 @@ function drawCurves(arr) {
     .attr('fill', textDark)
     .attr('stroke', textDark)
     .attr(
-      'transform', (d, i) => `translate(${i * box.width + 50}, ${offset + 320 - d[2] * 3})`,
+      'transform', (d, i) => `translate(${i * box.width + 50}, ${offset + 320 - d * 3})`,
     );
   // add line for links to notes
   node.append('svg:line')
     .attr('class', 'lines')
     .attr('y1', (d, i) => {
-      const textBlock = document.querySelector(`#notes_${i}`);
+       const textBlock = document.querySelector(`#notes_${i}`);
+      // const textBlock = d3.selectAll(`.notes_${i}`);
       let textOffset = 200;
       if (textBlock.children.length > 1) {
         textOffset = offset + (textBlock.children.length - 1) * 10 + 26;
       } else if (textBlock.children.length === 1) {
-        textOffset = offset + 320 - d[2] * 3;
+        textOffset = offset + 320 - d * 3;
       }
-      if (d[2] >= 50) {
-        textOffset = offset + 320 - d[2] * 3;
+      if (d >= 50) {
+        textOffset = offset + 320 - d * 3;
       }
       return textOffset;
     })
     .attr('y2', (d) => {
-      let textOffset = offset + 320 - d[2] * 3;
-      if (d[2] >= 50 && d[3] !== '') { // also catch nodes without text (set y1 and y2 the same so no line is drawn)
+      let textOffset = offset + 320 - d * 3;
+      if (d >= 50) { // TODO catch nodes without text (set y1 and y2 the same so no line is drawn)
         textOffset = offset + 204;
       }
       return textOffset;
@@ -131,7 +163,7 @@ function drawRow(arr) {
     .data(arr)
     .enter()
     .append('g')
-    .attr('class', (d, i) => `row_${i}`)
+    .attr('class', (d, i) => `row_${i} rows`)
     .attr('transform', (d) => `translate(0, ${d.yPos})`);
 
   g.append('svg:rect')
@@ -160,7 +192,7 @@ function drawRow(arr) {
     .append('text')
     .attr(
       'transform',
-      (d, i) => `translate(${i * box.width + 50}, ${gutter})`,
+      (d, i) => `translate(${i * box.width + 50}, ${gutter * 2})`,
     )
     .attr('id', (d, i) => `notes_${i + 1}`)
     .attr('class', 'block')
@@ -184,19 +216,14 @@ function drawRow(arr) {
   const text = d3.selectAll('.block');
   // run the text wrapping function on all text nodes
   text.call(wrap);
-  console.log(row[2]);
-  // TITLE
+
+  // STAGE SUBTITLE
   svg.select(`.row_${subtitlesIndex}`)
     .selectAll('.subtitles')
     .data(subtitles)
     .enter()
     .append('text')
-    .attr(
-      'transform',
-      (d, i) => {
-        console.log(row[2]);
-        return `translate(${i * box.width + 50}, ${20})`},
-    )
+    .attr('transform', (d, i) => `translate(${i * box.width + 50}, ${20})`)
     .attr('class', 'subtitle')
     .attr('fill', textLight)
     .attr('stroke', textLight)
@@ -205,6 +232,46 @@ function drawRow(arr) {
     .attr('font-family', 'Montserrat')
     .attr('font-weight', 'normal')
     .text((d) => d.toUpperCase())
+    .attr('text-anchor', 'start');
+
+  // ROW SUBTITLE
+  svg.selectAll('.rowtitles')
+    .data(arr)
+    .enter()
+    .append('text')
+    .attr('transform', (d) => {
+      const xText = 15;
+      const yText = d.yPos + d.ht / 2;
+      return `translate(${xText}, ${yText}) rotate(270)`;
+    })
+    .attr('class', 'rowtitles')
+    .attr('fill', textLight)
+    .attr('stroke', 'none')
+    .attr('font-size', 12)
+    .attr('font-family', 'Montserrat')
+    .attr('font-weight', 400)
+    .attr('text-anchor', 'middle')
+    .text((d) => {
+      let res = d.title.toUpperCase();
+      // TODO - dont create node for the missing row titles
+      if (res === 'TITLE_BLOCK' || res === 'V1.1') {
+        res = '';
+      }
+      return res;
+    });
+
+  // page title
+  svg.select('.row_0')
+    .append('text')
+    .attr('transform', () => `translate(${40}, ${50})`)
+    .attr('class', 'title')
+    .attr('fill', textLight)
+    .attr('stroke', textLight)
+    .attr('font-size', 32)
+    .attr('width', box.width)
+    .attr('font-family', 'Montserrat')
+    .attr('font-weight', 200)
+    .text(pageTitle.toUpperCase())
     .attr('text-anchor', 'start');
 }
 
@@ -323,11 +390,12 @@ function clearSVG() {
   svg.selectAll('text').remove();
   svg.selectAll('block').remove();
 
-  svg.select('.path').remove();
-  svg.select('.lines').remove();
+  svg.selectAll('.rows').remove();
+  svg.selectAll('.path').remove();
+  svg.selectAll('.lines').remove();
   svg.selectAll('.dots').remove();
 }
-
+/* 
 function layout() {
   const fill = bgGrey;
   const gutter = 10;
@@ -452,7 +520,7 @@ function layout() {
     .attr('text-anchor', 'middle')
     .text(titles[5].toUpperCase());
 }
-
+ */
 function download(filename, text) {
   const pom = document.createElement('a');
   pom.setAttribute(
@@ -499,6 +567,15 @@ function transposeCSV(arr) {
       subtitlesIndex = row.length;
     }
     rowObj.notes = arr[i].slice(2);
+
+    if (arr[i][0] === 'V1.1') {
+      pageTitle = arr[i][2];
+      rowObj.notes = [];
+    }
+    //reset the notes for score
+    if (arr[i][0] === 'SCORE') {
+      rowObj.notes = [];
+    }
     row.push(rowObj);
   }
 
@@ -513,7 +590,7 @@ function processData(txt) {
   if (arr[0][0] === 'V1.1') {
     console.log('transposed');
     arr = transposeCSV(arr);
-    width = arr[0].notes.length * columnWidth;
+    width = arr[1].notes.length * columnWidth;
     height = arr.length * 300;
   } else {
     console.log('original');
@@ -528,8 +605,7 @@ function processData(txt) {
   clearSVG();
 
   drawRow(arr);
-  //drawTextBlocks(arr);
-  //drawCurves(arr);
+  drawCurves(arr);
 }
 
 const canvasSetup = () => {
