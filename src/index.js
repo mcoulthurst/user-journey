@@ -27,6 +27,7 @@ const ctx = canv.getContext('2d');
 
 const box = { width: 120 };
 let titles = [];
+const row = [];
 const rowPos = [];
 const rowHt = [];
 const scores = [];
@@ -133,12 +134,12 @@ function drawRow(arr) {
     .append('g')
     .attr(
       'transform',
-      (d, i) => `translate(0, ${rowPos[i]})`,
+      (d, i) => `translate(0, ${d.yPos})`,
     );
 
   g
     .append('svg:rect')
-    .attr('height', (d, i) => rowHt[i])
+    .attr('height', (d, i) => d.ht)
     .attr('width', width)
     .attr('fill', fill)
     .attr('x', 0)
@@ -146,16 +147,16 @@ function drawRow(arr) {
 
   g
     .append('svg:rect')
-    .attr('height', (d, i) => rowHt[i])
+    .attr('height', (d, i) => d.ht)
     .attr('width', 20)
-    .attr('fill', (d, i) => colorScheme[i])
+    .attr('fill', (d, i) => d.color)
     .attr('x', 0)
     .attr('y', 0);
 
   g.selectAll('.notes')
     .data((d, i) => {
-      console.log(yPos);
-      return d;
+      console.log(d);
+      return d.notes;
     })
     .enter()
     .append('text')
@@ -460,11 +461,24 @@ function transposeCSV(arr) {
   colorScheme = [];
   let yPos = 0;
   let thisRow = -1;
+
   // eslint-disable-next-line no-plusplus
   for (i = 0; i < len; i++) {
-/*     if (!row[i]) {
-      row[i] = [];
-    } */
+    const rowObj = {};
+    //loop thru and create row objects
+    // when we find the scores create new object and add the notes to it
+    if (arr[i][0] === 'SCORE') {
+      rowObj.scores = +arr[i].slice(2);
+      i++;
+    }
+    rowObj.title = arr[i][0];
+    rowObj.color = arr[i][1];
+    let ht = getHeight(arr[i][0]);
+    rowObj.ht = ht;
+    rowObj.yPos = yPos;
+    yPos += ht + gutter;
+    rowObj.notes = arr[i].slice(2);
+/* 
     titles.push(arr[i][0]);
     // ignore score
     if (arr[i][0] !== 'SCORE') {
@@ -489,19 +503,19 @@ function transposeCSV(arr) {
       } else {
         scores.push(+arr[i][j]);
       }
-    }
-    console.log(row);
-    //newArray.push(row);
+    } */
+    console.log(rowObj);
+    row.push(rowObj);
   }
-  newArray = row;
+  //newArray = row;
   // overwrite v1.1 with actual title
   //titles[0] = arr[0][2];
   console.log(rowPos);
   console.log(rowHt);
   console.log(scores);
   console.log(scoreNoteIndex);
-  console.log(newArray);
-  return newArray;
+  console.log(row);
+  return row;
 }
 
 function processData(txt) {
@@ -512,7 +526,8 @@ function processData(txt) {
   if (arr[0][0] === 'V1.1') {
     console.log('transposed');
     arr = transposeCSV(arr);
-    width = arr[2].length * columnWidth;
+    console.log(arr);
+    width = arr[0].notes.length * columnWidth;
     height = arr.length * 300;
   } else {
     console.log('original');
