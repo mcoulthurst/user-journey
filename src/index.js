@@ -16,7 +16,7 @@ const margin = {
 };
 let width = 1200;
 let height = 800;
-const offset = 90;
+
 const columnWidth = 120;
 let yPos = 0;
 let scoreNoteIndex = 0;
@@ -38,41 +38,49 @@ const textDark = '#4D4844';
 const bgGrey = '#F5F6F8';
 const gutter = 10;
 
+// create a text wrapping function
+const wrap = d3
+  .textwrap()
+  .bounds({ height: 100, width: 100 }) // wrap to 480 x 960 pixels
+  .method('tspans'); // wrap with tspans in all browsers
+
 function drawCurves(arr) {
   const lines = [];
   let xPos;
   let yPos;
   let pt;
+  const offset = 10;
 
-  const data = arr[scoreNoteIndex].scores;
+  const data = arr[scoreNoteIndex];
   console.log(data);
   // eslint-disable-next-line no-plusplus
-  for (let i = 0; i < data.length; i++) {
-    yPos = offset + 320 - data[i] * 3; // use the 'emotion' value contained in column 2
+  for (let i = 0; i < data.scores.length; i++) {
+    yPos = offset + 320 - data.scores[i] * 3; // use the 'emotion' value contained in column 2
     xPos = i * 120 + 50;
     pt = [xPos, yPos];
     lines.push(pt);
   }
 
   const lineFunction = d3.line().curve(d3.curveCardinal);
-  const g = svg.append('g').attr('id', 'curve');
+  const g = svg.select(`.row_${scoreNoteIndex}`)
+    .append('g').attr('id', 'curve');
 
-  g.selectAll('.notes')
-    .data(data)
+  g.selectAll('.comments')
+    .data(data.comments)
     .enter()
     .append('text')
     .attr(
       'transform',
       (d, i) => `translate(${i * box.width + 50}, ${gutter * 2})`,
     )
-    .attr('id', (d, i) => `notes_${i + 1}`)
-    .attr('class', 'block')
+    .attr('id', (d, i) => `notes_${i}`)
+    .attr('class', 'comments')
     .attr('fill', textDark)
     .attr('stroke', 'none')
     .attr('font-size', 10)
-    .attr('y', (d) => {
+    .attr('y', (d, i) => {
       let textOffset = 0;
-      if (d >= 50) {
+      if (data.scores[i] >= 50) {
         textOffset = 200;
       }
       return textOffset;
@@ -84,6 +92,10 @@ function drawCurves(arr) {
     .text((d) => d)
     .attr('text-anchor', 'start');
 
+  const text = d3.selectAll('.comments');
+  // run the text wrapping function on all text nodes
+  text.call(wrap);
+
   g.append('path')
     .attr('d', lineFunction(lines))
     .attr('stroke', textDark)
@@ -93,7 +105,7 @@ function drawCurves(arr) {
     .attr('fill', 'none');
 
   const node = g.selectAll('.dots')
-    .data(data)
+    .data(data.scores)
     .enter();
 
   // add circles for emotions
@@ -109,23 +121,25 @@ function drawCurves(arr) {
   node.append('svg:line')
     .attr('class', 'lines')
     .attr('y1', (d, i) => {
-       const textBlock = document.querySelector(`#notes_${i}`);
+      const textBlock = document.querySelector(`#notes_${i}`);
+      console.log(i, `#notes_${i}`);
       // const textBlock = d3.selectAll(`.notes_${i}`);
-      let textOffset = 200;
-      if (textBlock.children.length > 1) {
-        textOffset = offset + (textBlock.children.length - 1) * 10 + 26;
+      let textOffset = 10;
+      if (textBlock.children.length > 0) {
+        textOffset = offset + (textBlock.children.length - 1) * 10 + 18;
       } else if (textBlock.children.length === 1) {
         textOffset = offset + 320 - d * 3;
       }
-      if (d >= 50) {
+      if (data.scores[i] >= 50) {
         textOffset = offset + 320 - d * 3;
       }
       return textOffset;
     })
-    .attr('y2', (d) => {
+    .attr('y2', (d, i) => {
       let textOffset = offset + 320 - d * 3;
-      if (d >= 50) { // TODO catch nodes without text (set y1 and y2 the same so no line is drawn)
-        textOffset = offset + 204;
+      if (data.scores[i] >= 50 && data.comments[i] !== '') {
+        // TODO catch nodes without text (set y1 and y2 the same so no line is drawn)
+        textOffset = offset + 196;
       }
       return textOffset;
     })
@@ -153,11 +167,7 @@ function getHeight(str) {
 
 function drawRow(arr) {
   const fill = bgGrey;
-  // create a text wrapping function
-  const wrap = d3
-    .textwrap()
-    .bounds({ height: 100, width: 100 }) // wrap to 480 x 960 pixels
-    .method('tspans'); // wrap with tspans in all browsers
+
 
   const g = svg.selectAll('.title')
     .data(arr)
@@ -395,7 +405,7 @@ function clearSVG() {
   svg.selectAll('.lines').remove();
   svg.selectAll('.dots').remove();
 }
-/* 
+/*
 function layout() {
   const fill = bgGrey;
   const gutter = 10;
@@ -543,7 +553,7 @@ function transposeCSV(arr) {
   let i = 0;
   titles = [];
   row = [];
-  colorScheme = [];
+  // colorScheme = [];
   let yPos = 0;
 
   // eslint-disable-next-line no-plusplus
@@ -555,6 +565,7 @@ function transposeCSV(arr) {
     if (arr[i][0] === 'SCORE') {
       rowObj.scores = arr[i].slice(2);
       scoreNoteIndex = i;
+      // eslint-disable-next-line no-plusplus
       i++;
     }
     rowObj.title = arr[i][0];
@@ -572,8 +583,9 @@ function transposeCSV(arr) {
       pageTitle = arr[i][2];
       rowObj.notes = [];
     }
-    //reset the notes for score
-    if (arr[i][0] === 'SCORE') {
+    // reset the notes for score
+    if (i > 0 && arr[i - 1][0] === 'SCORE') {
+      rowObj.comments = arr[i].slice(2);
       rowObj.notes = [];
     }
     row.push(rowObj);
@@ -590,7 +602,7 @@ function processData(txt) {
   if (arr[0][0] === 'V1.1') {
     console.log('transposed');
     arr = transposeCSV(arr);
-    width = arr[1].notes.length * columnWidth;
+    width = arr[3].notes.length * columnWidth;
     height = arr.length * 300;
   } else {
     console.log('original');
