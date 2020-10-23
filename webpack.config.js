@@ -19,7 +19,7 @@ module.exports = {
       patterns: [
         { from: 'src/css', to: 'css' },
         { from: 'assets', to: 'assets' },
-        { from: 'src/js', to: 'js' },
+        /* { from: 'src/js', to: 'js' }, */
       ],
     }),
     new CleanWebpackPlugin({ cleanStaleWebpackAssets: false }),

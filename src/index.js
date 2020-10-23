@@ -131,7 +131,6 @@ function drawCurves(arr) {
       if (data.comments[i] === '') {
         textOffset = 0;
       }
-      console.log(data.scores[i], textOffset);
       return textOffset;
     })
     .attr('y2', (d, i) => {
