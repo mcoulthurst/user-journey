@@ -12,13 +12,13 @@ With this app, the user journey can be described in text from a CSV file and the
 ## Data
 
 The CSV should be arranged in the following way (see [sample CSV](assets/data/transposed.csv) for details):
+
 The layout of the CSV mirrors the layout of the diagram. Each row represents a row in the chart. The first column is used as the row title, the second is the colour of the row title bar.
 There are three custom titles:
 
-* the first cell (V1.1) is used for the chart title.
-* SCORE is used to draw the customer experience curve
-* the line following is used for the notes within the row
-* TITLE_BLOCK is used to display a row with simple titles (see example below)
+* V1.1 is used to indicate the data for the main chart title.
+* SCORE is used to draw the customer experience curve. (The line following is used for the notes within the row.)
+* TITLE_BLOCK is used to display a row with simple titles (see example below).
 
 The roider of the rows can be altered or added to as required. 
 
