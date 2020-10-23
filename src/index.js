@@ -135,7 +135,7 @@ function drawCurves(arr) {
     })
     .attr('y2', (d, i) => {
       let textOffset = offset + 320 - d * 3;
-      if (data.scores[i] >= 50 ) {
+      if (data.scores[i] >= 50) {
         textOffset = offset + 196;
       }
       // catch nodes without text (set y1 and y2 the same so no line is drawn)

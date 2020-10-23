@@ -11,17 +11,18 @@ With this app, the user journey can be described in text from a CSV file and the
 
 ## Data
 
-The CSV should be arranged in the following way (see [sample CSV](assets/data/test.csv) for details):
-The first row is used for the section titles, ie these appear on the left hand side of the final image. The order of the columns is important and the columns are displayed in this order:
+The CSV should be arranged in the following way (see [sample CSV](assets/data/transposed.csv) for details):
+The layout of the CSV mirrors the layout of the diagram. Each row represents a row in the chart. The first column is used as the row title, the second is the colour of the row title bar.
+There are three custom titles:
 
-* column 1 - only the title in row 2 is displayed
-* column 2 - the stage subtitles
-* column 3 - the 'emotion' rating on a scale of 10 to 100
-* column 4 - the text notes to accompany the emotion / touch points on the chart
-* column 5 - the notes section for each stage
-* column 6 - a section for any opportunites at a given stage
+* the first cell (V1.1) is used for the chart title.
+* SCORE is used to draw the customer experience curve
+* the line following is used for the notes within the row
+* TITLE_BLOCK is used to display a row with simple titles (see example below)
 
-The section titles cana be renamed as required, eg to display a timescale instead of pain points.
+The roider of the rows can be altered or added to as required. 
+
+The section titles can be renamed as required, eg to display a timescale instead of pain points.
 
 ## Example screenshot
 
