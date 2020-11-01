@@ -20,13 +20,21 @@ There are three custom titles:
 * SCORE is used to draw the customer experience curve. (The line following is used for the notes within the row.)
 * TITLE_BLOCK is used to display a row with simple titles (see example below).
 
-The roider of the rows can be altered or added to as required.
+The order of the rows can be altered or added to as required.
 
 The section titles can be renamed as required, eg to display a timescale instead of pain points.
+
+[User Journey Generator Demo](https://lightness.co.uk/user-journey)
 
 ## Example screenshot
 
 ![User Journey Screenshot](journey.png)
+
+## Installation
+
+* Clone the repo
+* Run `npm install`
+* Run `npm start`
 
 ## Bug report
 
