@@ -16,13 +16,6 @@
   </head>
 
   <body>
-    <!--[if IE]>
-      <p class="browserupgrade">
-        You are using an <strong>outdated</strong> browser. Please
-        <a href="https://browsehappy.com/">upgrade your browser</a> to improve
-        your experience and security.
-      </p>
-    <![endif]-->
 
     <div class="container-fluid" role="main">
       <div class="row">
@@ -35,6 +28,8 @@
           </label>
           <button id="download-png-button" class="button">Download PNG</button>
           <button id="download-svg-button" class="button">Download SVG</button>
+          <a id="download-eg1-button" class="button_csv" href="assets/data/example1.csv">Example CSV 1</a>
+          <a id="download-eg1-button" class="button_csv" href="assets/data/example2.csv">Example CSV 2</a>
         </div>
       </div>
       <canvas id="canv" class="hidden" width="1200" height="800"></canvas>
@@ -52,13 +47,5 @@
       </div>
     </div>
 
-    <!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
-    <!-- 
-    <script>
-      window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
-      ga('create', 'UA-XXXXX-Y', 'auto'); ga('set', 'transport', 'beacon'); ga('send', 'pageview')
-    </script>
-    <script src="https://www.google-analytics.com/analytics.js" async></script>
-    -->
   </body>
 </html>

@@ -7,7 +7,7 @@ import { textwrap } from 'd3-textwrap';
 const d3 = Object.assign(d3Base);
 d3.textwrap = textwrap;
 // const URL = 'assets/data/test_shortened.csv';
-const URL = 'assets/data/transposed.csv';
+const URL = 'assets/data/example2.csv';
 const margin = {
   top: 20,
   right: 20,
